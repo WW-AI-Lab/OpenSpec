@@ -10,7 +10,11 @@ export function getFfChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-ff-change',
     description: 'Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.',
-    instructions: `Fast-forward through artifact creation - generate everything needed to start implementation in one go.
+    instructions: `快速推进 OpenSpec artifact 创建，一次性生成开始 implementation 所需的规划产物。
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Guidance**: 在创建 proposal/design/tasks 前，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。生成 artifacts 时必须先评估现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -113,7 +117,11 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
     description: 'Create a change and generate all artifacts needed for implementation in one go',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `Fast-forward through artifact creation - generate everything needed to start implementation.
+    content: `快速推进 OpenSpec artifact 创建，一次性生成开始 implementation 所需的规划产物。
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Checklist**: 创建 proposal/design/tasks 前，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
 
 **Input**: The argument after \`/opsx:ff\` is the change name (kebab-case), OR a description of what the user wants to build.
 

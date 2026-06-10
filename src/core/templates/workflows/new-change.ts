@@ -10,7 +10,11 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-new-change',
     description: 'Start a new OpenSpec change using the experimental artifact workflow. Use when the user wants to create a new feature, fix, or modification with a structured step-by-step approach.',
-    instructions: `Start a new change using the experimental artifact-driven approach.
+    instructions: `使用 artifact-driven workflow 创建一个新的 OpenSpec change。
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Guidance**: 后续创建 proposal/design/tasks 时，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用），并从现有 specs、模块、接口、共享能力、配置、测试和部署约束出发进行架构评估。
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -85,7 +89,11 @@ export function getOpsxNewCommandTemplate(): CommandTemplate {
     description: 'Start a new change using the experimental artifact workflow (OPSX)',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `Start a new change using the experimental artifact-driven approach.
+    content: `使用 artifact-driven workflow 创建一个新的 OpenSpec change。
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Checklist**: 后续创建 proposal/design/tasks 时，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束，并从复用、边界、质量属性和复杂度角度进行架构评估。
 
 **Input**: The argument after \`/opsx:new\` is the change name (kebab-case), OR a description of what the user wants to build.
 

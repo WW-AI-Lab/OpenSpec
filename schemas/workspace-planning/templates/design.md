@@ -1,6 +1,6 @@
 ## Context
 
-Summarize the workspace planning context, relevant linked areas, and constraints.
+总结 workspace planning 上下文、相关 linked areas 和约束。
 
 ## Goals / Non-Goals
 
@@ -8,7 +8,39 @@ Summarize the workspace planning context, relevant linked areas, and constraints
 -
 
 **Non-Goals:**
-- Creating repo-local implementation artifacts before an affected area is selected.
+- 在选择 affected area 前创建 repo-local implementation artifacts。
+
+## Architecture Assessment
+
+### Existing Design Reuse
+
+- Existing specs / modules / services:
+- Reuse plan:
+- Gaps:
+
+### Boundaries and Ownership
+
+- Affected areas:
+- Owners:
+- Handoffs:
+- Shared contracts:
+
+### Quality Attributes
+
+- Security:
+- Reliability:
+- Performance:
+- Maintainability:
+- Observability:
+- Testability:
+- Deployability:
+
+### Complexity and Exceptions
+
+- New abstraction / dependency / service / protocol:
+- Justification:
+- Validation:
+- Rollback:
 
 ## Decisions
 

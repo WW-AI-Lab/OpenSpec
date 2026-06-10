@@ -10,16 +10,20 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-propose',
     description: 'Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.',
-    instructions: `Propose a new change - create the change and generate all artifacts in one step.
+    instructions: `提出一个新的 OpenSpec change，并一次性生成达到 implementation-ready 所需的 artifacts。
 
-I'll create a change with artifacts:
+我会创建包含以下 artifacts 的 change：
 - proposal.md (what & why)
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+准备实现时，运行 /opsx:apply。
 
 ---
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Guidance**: 在创建 proposal/design/tasks 前，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。生成 artifacts 时必须先评估现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -122,16 +126,20 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
     description: 'Propose a new change - create it and generate all artifacts in one step',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `Propose a new change - create the change and generate all artifacts in one step.
+    content: `提出一个新的 OpenSpec change，并一次性生成达到 implementation-ready 所需的 artifacts。
 
-I'll create a change with artifacts:
+我会创建包含以下 artifacts 的 change：
 - proposal.md (what & why)
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+准备实现时，运行 /opsx:apply。
 
 ---
+
+**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Checklist**: 创建 proposal/design/tasks 前，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
 
 **Input**: The argument after \`/opsx:propose\` is the change name (kebab-case), OR a description of what the user wants to build.
 

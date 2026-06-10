@@ -18,6 +18,11 @@ The `openspec/config.yaml` file is the easiest way to customize OpenSpec for you
 - **Inject project context** - AI sees your tech stack, conventions, etc.
 - **Add per-artifact rules** - Custom rules for specific artifacts
 
+OpenSpec's built-in workflows include lightweight architecture guidance by default:
+proposal artifacts screen architecture impact, design artifacts assess reuse and boundaries,
+and tasks should include verification for architecture-significant constraints. Use project
+configuration to make your team's own architecture rules explicit.
+
 ### Quick Setup
 
 ```bash
@@ -43,6 +48,11 @@ rules:
   specs:
     - Use Given/When/Then format
     - Reference existing patterns before inventing new ones
+  design:
+    - Reuse existing modules and interfaces before introducing new abstractions
+    - Document alternatives for new dependencies, services, storage, protocols, or shared infrastructure
+  tasks:
+    - Add verification tasks for architecture constraints captured in design.md
 ```
 
 ### How It Works

@@ -9,19 +9,19 @@
 ### npm
 
 ```bash
-npm install -g @fission-ai/openspec@latest
+npm install -g @ww-ai-lab/openspec@latest
 ```
 
 ### pnpm
 
 ```bash
-pnpm add -g @fission-ai/openspec@latest
+pnpm add -g @ww-ai-lab/openspec@latest
 ```
 
 ### yarn
 
 ```bash
-yarn global add @fission-ai/openspec@latest
+yarn global add @ww-ai-lab/openspec@latest
 ```
 
 ### bun
@@ -30,7 +30,7 @@ Bun can install OpenSpec globally, but OpenSpec currently runs on Node.js.
 You still need Node.js 20.19.0 or higher available on `PATH`.
 
 ```bash
-bun add -g @fission-ai/openspec@latest
+bun add -g @ww-ai-lab/openspec@latest
 ```
 
 ## Nix
@@ -38,13 +38,13 @@ bun add -g @fission-ai/openspec@latest
 Run OpenSpec directly without installation:
 
 ```bash
-nix run github:Fission-AI/OpenSpec -- init
+nix run github:WW-AI-Lab/OpenSpec -- init
 ```
 
 Or install to your profile:
 
 ```bash
-nix profile install github:Fission-AI/OpenSpec
+nix profile install github:WW-AI-Lab/OpenSpec
 ```
 
 Or add to your development environment in `flake.nix`:
@@ -53,7 +53,7 @@ Or add to your development environment in `flake.nix`:
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    openspec.url = "github:Fission-AI/OpenSpec";
+    openspec.url = "github:WW-AI-Lab/OpenSpec";
   };
 
   outputs = { nixpkgs, openspec, ... }: {

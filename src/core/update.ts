@@ -22,6 +22,7 @@ import {
   getSkillTemplates,
   getCommandContents,
   generateSkillContent,
+  generateSkillReferences,
   getToolsWithSkillsDir,
   type ToolVersionStatus,
 } from './shared/index.js';
@@ -200,6 +201,9 @@ export class UpdateCommand {
             const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
             await FileSystemUtils.writeFile(skillFile, skillContent);
+            for (const reference of generateSkillReferences(template, transformer)) {
+              await FileSystemUtils.writeFile(path.join(skillDir, reference.path), reference.content);
+            }
           }
 
           removedDeselectedSkillCount += await this.removeUnselectedSkillDirs(skillsDir, desiredWorkflows);
@@ -274,7 +278,7 @@ export class UpdateCommand {
       console.log('  /opsx:continue  Create the next artifact');
       console.log('  /opsx:apply     Implement tasks');
       console.log();
-      console.log(`Learn more: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
+      console.log(`Learn more: ${chalk.cyan('https://github.com/WW-AI-Lab/OpenSpec')}`);
     }
 
     const configuredAndNewTools = [...new Set([...configuredTools, ...newlyConfiguredTools])];
@@ -694,6 +698,9 @@ export class UpdateCommand {
             const transformer = (tool.value === 'opencode' || tool.value === 'pi') ? transformToHyphenCommands : undefined;
             const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
             await FileSystemUtils.writeFile(skillFile, skillContent);
+            for (const reference of generateSkillReferences(template, transformer)) {
+              await FileSystemUtils.writeFile(path.join(skillDir, reference.path), reference.content);
+            }
           }
         }
 

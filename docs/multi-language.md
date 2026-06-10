@@ -2,6 +2,21 @@
 
 Configure OpenSpec to generate artifacts in languages other than English.
 
+## Default Language
+
+New projects created with `openspec init` default to Simplified Chinese artifact output:
+
+```yaml
+schema: spec-driven
+
+context: |
+  语言：中文（简体）
+  OpenSpec 产出物默认使用简体中文撰写。
+  命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+```
+
+Existing projects are not rewritten. To use another language, edit `openspec/config.yaml` and replace the language instruction in `context:`.
+
 ## Quick Setup
 
 Add a language instruction to your `openspec/config.yaml`:

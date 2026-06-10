@@ -39,6 +39,7 @@ import {
   getSkillTemplates,
   getCommandContents,
   generateSkillContent,
+  generateSkillReferences,
   type ToolSkillStatus,
 } from './shared/index.js';
 import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
@@ -54,6 +55,9 @@ const { version: OPENSPEC_VERSION } = require('../../package.json');
 // -----------------------------------------------------------------------------
 
 const DEFAULT_SCHEMA = 'spec-driven';
+const DEFAULT_CONTEXT = `语言：中文（简体）
+OpenSpec 产出物默认使用简体中文撰写。
+命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。`;
 
 const PROGRESS_SPINNER = {
   interval: 80,
@@ -543,6 +547,9 @@ export class InitCommand {
 
             // Write the skill file
             await FileSystemUtils.writeFile(skillFile, skillContent);
+            for (const reference of generateSkillReferences(template, transformer)) {
+              await FileSystemUtils.writeFile(path.join(skillDir, reference.path), reference.content);
+            }
           }
         }
         if (!shouldGenerateSkills) {
@@ -611,7 +618,7 @@ export class InitCommand {
     }
 
     try {
-      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA });
+      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA, context: DEFAULT_CONTEXT });
       await FileSystemUtils.writeFile(configPath, yamlContent);
       return 'created';
     } catch {
@@ -713,8 +720,8 @@ export class InitCommand {
 
     // Links
     console.log();
-    console.log(`Learn more: ${chalk.cyan('https://github.com/Fission-AI/OpenSpec')}`);
-    console.log(`Feedback:   ${chalk.cyan('https://github.com/Fission-AI/OpenSpec/issues')}`);
+    console.log(`Learn more: ${chalk.cyan('https://github.com/WW-AI-Lab/OpenSpec')}`);
+    console.log(`Feedback:   ${chalk.cyan('https://github.com/WW-AI-Lab/OpenSpec/issues')}`);
 
     // Restart instruction if any tools were configured
     if (results.createdTools.length > 0 || results.refreshedTools.length > 0) {

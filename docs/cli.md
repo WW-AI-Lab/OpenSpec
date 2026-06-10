@@ -171,7 +171,7 @@ openspec update [path] [options]
 
 ```bash
 # Update instruction files after npm upgrade
-npm update @fission-ai/openspec
+npm update @ww-ai-lab/openspec
 openspec update
 ```
 
@@ -1123,7 +1123,7 @@ openspec schema which spec-driven
 
 ```
 spec-driven resolves from: package
-  Source: /usr/local/lib/node_modules/@fission-ai/openspec/schemas/spec-driven
+  Source: /usr/local/lib/node_modules/@ww-ai-lab/openspec/schemas/spec-driven
 ```
 
 **Schema precedence:**

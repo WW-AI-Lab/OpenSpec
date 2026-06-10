@@ -1,6 +1,6 @@
 {
-  "name": "@fission-ai/openspec",
-  "version": "1.4.1",
+  "name": "@ww-ai-lab/openspec",
+  "version": "1.4.2",
   "description": "AI-native system for spec-driven development",
   "keywords": [
     "openspec",
@@ -9,10 +9,10 @@
     "ai",
     "development"
   ],
-  "homepage": "https://github.com/Fission-AI/OpenSpec",
+  "homepage": "https://github.com/WW-AI-Lab/OpenSpec",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Fission-AI/OpenSpec"
+    "url": "git+https://github.com/WW-AI-Lab/OpenSpec.git"
   },
   "license": "MIT",
   "author": "OpenSpec Contributors",
@@ -27,7 +27,7 @@
     }
   },
   "bin": {
-    "openspec": "./bin/openspec.js"
+    "openspec": "bin/openspec.js"
   },
   "files": [
     "dist",

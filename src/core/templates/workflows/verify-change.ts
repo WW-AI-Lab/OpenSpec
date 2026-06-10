@@ -10,7 +10,11 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-verify-change',
     description: 'Verify implementation matches change artifacts. Use when the user wants to validate that implementation is complete, correct, and coherent before archiving.',
-    instructions: `Verify that an implementation matches the change artifacts (specs, tasks, design).
+    instructions: `验证 implementation 是否匹配 OpenSpec change artifacts（specs、tasks、design）。
+
+**Language**: 默认使用简体中文输出 verification report。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Guidance**: 验证前先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。除 completeness/correctness/coherence 外，还要检查实现是否遵守 design.md 中的架构评估、复用策略、边界与职责、质量属性、复杂度例外和验证要求。发现绕过公共边界、重复实现共享能力、无验证覆盖的架构约束时，至少报告 WARNING；如果直接违反 requirement 或关键 design decision，报告 CRITICAL。
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -182,7 +186,11 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
     description: 'Verify implementation matches change artifacts before archiving',
     category: 'Workflow',
     tags: ['workflow', 'verify', 'experimental'],
-    content: `Verify that an implementation matches the change artifacts (specs, tasks, design).
+    content: `验证 implementation 是否匹配 OpenSpec change artifacts（specs、tasks、design）。
+
+**Language**: 默认使用简体中文输出 verification report。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Checklist**: 除 completeness/correctness/coherence 外，还要检查实现是否遵守 design.md 中的架构评估、复用策略、边界与职责、质量属性、复杂度例外和验证要求。发现绕过公共边界、重复实现共享能力、无验证覆盖的架构约束时，至少报告 WARNING；如果直接违反 requirement 或关键 design decision，报告 CRITICAL。
 
 **Input**: Optionally specify a change name after \`/opsx:verify\` (e.g., \`/opsx:verify add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 

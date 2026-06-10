@@ -12,6 +12,7 @@ import {
   getToolSkillStatus,
   getToolsWithSkillsDir,
   extractGeneratedByVersion,
+  generateSkillReferences,
 } from '../shared/index.js';
 import type { WorkspaceSkillState } from './foundation.js';
 
@@ -360,6 +361,13 @@ export async function generateWorkspaceAgentSkills(
         const skillFile = FileSystemUtils.joinPath(skillsDir, dirName, 'SKILL.md');
         const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
         await FileSystemUtils.writeFile(skillFile, skillContent);
+        const skillDir = FileSystemUtils.joinPath(skillsDir, dirName);
+        for (const reference of generateSkillReferences(template, transformer)) {
+          await FileSystemUtils.writeFile(
+            FileSystemUtils.joinPath(skillDir, reference.path),
+            reference.content
+          );
+        }
       }
 
       const result = makeAgentResult(workspaceRoot, tool, profileContext.workflowIds);
@@ -472,6 +480,13 @@ export async function updateWorkspaceAgentSkills(
         const skillFile = FileSystemUtils.joinPath(skillsDir, dirName, 'SKILL.md');
         const skillContent = generateSkillContent(template, OPENSPEC_VERSION, transformer);
         await FileSystemUtils.writeFile(skillFile, skillContent);
+        const skillDir = FileSystemUtils.joinPath(skillsDir, dirName);
+        for (const reference of generateSkillReferences(template, transformer)) {
+          await FileSystemUtils.writeFile(
+            FileSystemUtils.joinPath(skillDir, reference.path),
+            reference.content
+          );
+        }
       }
 
       const removed = await removeManagedWorkflowSkillDirs(

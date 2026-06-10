@@ -1335,6 +1335,14 @@ More user content after markers.
         expect(exists).toBe(true);
       }
 
+      const architectureReference = path.join(
+        skillsDir,
+        'openspec-propose',
+        'references',
+        'architecture-guidance.md'
+      );
+      expect(await FileSystemUtils.fileExists(architectureReference)).toBe(true);
+
       const nonCoreSkill = path.join(skillsDir, 'openspec-new-change', 'SKILL.md');
       expect(await FileSystemUtils.fileExists(nonCoreSkill)).toBe(false);
     });

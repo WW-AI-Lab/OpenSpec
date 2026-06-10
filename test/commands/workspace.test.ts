@@ -414,6 +414,7 @@ describe('workspace command', () => {
       })
     );
     expect(fs.existsSync(path.join(workspaceRoot, '.codex', 'skills', 'openspec-propose', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(workspaceRoot, '.codex', 'skills', 'openspec-propose', 'references', 'architecture-guidance.md'))).toBe(true);
     expect(fs.existsSync(path.join(workspaceRoot, '.codex', 'skills', 'openspec-explore', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(workspaceRoot, '.codex', 'skills', 'openspec-sync-specs', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(workspaceRoot, '.codex', 'skills', 'openspec-archive-change', 'SKILL.md'))).toBe(true);

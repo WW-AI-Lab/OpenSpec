@@ -75,6 +75,8 @@ describe('InitCommand', () => {
 
       const content = await fs.readFile(configPath, 'utf-8');
       expect(content).toContain('schema: spec-driven');
+      expect(content).toContain('语言：中文（简体）');
+      expect(content).toContain('OpenSpec 产出物默认使用简体中文撰写');
     });
 
     it('should create core profile skills for Claude Code by default', async () => {
@@ -100,6 +102,17 @@ describe('InitCommand', () => {
         expect(content).toContain('name:');
         expect(content).toContain('description:');
       }
+
+      const architectureReference = path.join(
+        testDir,
+        '.claude',
+        'skills',
+        'openspec-propose',
+        'references',
+        'architecture-guidance.md'
+      );
+      expect(await fileExists(architectureReference)).toBe(true);
+      expect(await fs.readFile(architectureReference, 'utf-8')).toContain('通用架构指导');
 
       // Non-core skills should NOT be created
       const nonCoreSkillNames = [

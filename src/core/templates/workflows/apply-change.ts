@@ -10,7 +10,11 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-apply-change',
     description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.',
-    instructions: `Implement tasks from an OpenSpec change.
+    instructions: `实现 OpenSpec change 中的 tasks。
+
+**Language**: 默认使用简体中文输出进度和总结。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Guidance**: 实现前先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）和 change 的 design.md。代码必须遵守 design.md 中的架构评估、边界、复用策略和验证要求。若实现发现既定架构决策不可行，先暂停并建议更新 artifacts，不要绕过设计约束直接实现。
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -170,7 +174,11 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
     description: 'Implement tasks from an OpenSpec change (Experimental)',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `Implement tasks from an OpenSpec change.
+    content: `实现 OpenSpec change 中的 tasks。
+
+**Language**: 默认使用简体中文输出进度和总结。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**Architecture Checklist**: 实现前先阅读 change 的 design.md。代码必须遵守 design.md 中的架构评估、边界、复用策略和验证要求。若实现发现既定架构决策不可行，先暂停并建议更新 artifacts，不要绕过设计约束直接实现。
 
 **Input**: Optionally specify a change name (e.g., \`/opsx:apply add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 

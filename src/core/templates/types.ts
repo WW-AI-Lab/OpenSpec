@@ -6,9 +6,15 @@ export interface SkillTemplate {
   name: string;
   description: string;
   instructions: string;
+  references?: SkillReference[];
   license?: string;
   compatibility?: string;
   metadata?: Record<string, string>;
+}
+
+export interface SkillReference {
+  path: string;
+  content: string;
 }
 
 export interface CommandTemplate {

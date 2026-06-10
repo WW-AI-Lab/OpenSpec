@@ -1,4 +1,4 @@
-# @fission-ai/openspec
+# @ww-ai-lab/openspec
 
 ## 1.4.1
 
