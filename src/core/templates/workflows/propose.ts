@@ -23,7 +23,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Guidance**: 在创建 proposal/design/tasks 前，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。生成 artifacts 时必须先评估现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
+**Architecture Guidance**: 在创建 proposal/design/tasks 前，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。生成 artifacts 时必须先评估现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。创建 tasks.md 时还必须规划并发执行策略：明确哪些调研、测试、验证或独立实现切片可由 sub-agent 完成，哪些共享接口、架构决策或同文件修改必须由主 agent 顺序协调。
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -74,6 +74,7 @@ export function getOpsxProposeSkillTemplate(): SkillTemplate {
       - Read any completed dependency files for context
       - Create the artifact file using \`template\` as the structure and write it to \`resolvedOutputPath\`
       - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
+      - If creating tasks.md, include a parallelization/sub-agent plan that names independent workstreams, required context files, allowed read/edit boundaries, expected outputs, dependency gates, and main-agent merge responsibilities
       - Show brief progress: "Created <artifact-id>"
 
    b. **Continue until all \`applyRequires\` artifacts are complete**
@@ -104,6 +105,7 @@ After completing all artifacts, summarize:
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use \`template\` as the structure for your output file - fill in its sections
+- When writing tasks.md, preserve checkbox syntax and make concurrency explicit: identify tasks safe for sub-agent delegation, tasks that must remain sequential, and how the main agent will verify and integrate sub-agent results
 - **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
   - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
   - These guide what you write, but should never appear in the output
@@ -139,7 +141,7 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Checklist**: 创建 proposal/design/tasks 前，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
+**Architecture Checklist**: 创建 proposal/design/tasks 前，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。创建 tasks.md 时还必须规划并发执行策略：明确哪些调研、测试、验证或独立实现切片可由 sub-agent 完成，哪些共享接口、架构决策或同文件修改必须由主 agent 顺序协调。
 
 **Input**: The argument after \`/opsx:propose\` is the change name (kebab-case), OR a description of what the user wants to build.
 
@@ -190,6 +192,7 @@ export function getOpsxProposeCommandTemplate(): CommandTemplate {
       - Read any completed dependency files for context
       - Create the artifact file using \`template\` as the structure and write it to \`resolvedOutputPath\`
       - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
+      - If creating tasks.md, include a parallelization/sub-agent plan that names independent workstreams, required context files, allowed read/edit boundaries, expected outputs, dependency gates, and main-agent merge responsibilities
       - Show brief progress: "Created <artifact-id>"
 
    b. **Continue until all \`applyRequires\` artifacts are complete**
@@ -220,6 +223,7 @@ After completing all artifacts, summarize:
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use \`template\` as the structure for your output file - fill in its sections
+- When writing tasks.md, preserve checkbox syntax and make concurrency explicit: identify tasks safe for sub-agent delegation, tasks that must remain sequential, and how the main agent will verify and integrate sub-agent results
 - **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
   - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
   - These guide what you write, but should never appear in the output

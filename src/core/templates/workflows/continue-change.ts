@@ -14,7 +14,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Guidance**: 如果要创建 proposal、design 或 tasks，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。创建 design 时必须评估现有设计复用、边界与职责、质量属性、复杂度例外和验证方式；创建 tasks 时必须把关键架构约束转成可验证任务。
+**Architecture Guidance**: 如果要创建 proposal、design 或 tasks，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。创建 design 时必须评估现有设计复用、边界与职责、质量属性、复杂度例外和验证方式；创建 tasks 时必须把关键架构约束转成可验证任务，并规划可由 sub-agent 并发完成的调研、测试、验证和独立实现切片。
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -73,6 +73,7 @@ export function getContinueChangeSkillTemplate(): SkillTemplate {
      - Read any completed dependency files for context
      - Use \`template\` as the structure - fill in its sections
      - Apply \`context\` and \`rules\` as constraints when writing - but do NOT copy them into the file
+     - If creating tasks.md, include a parallelization/sub-agent plan with dependencies, context inputs, read/edit boundaries, expected outputs, and main-agent merge responsibilities
      - Write to the \`resolvedOutputPath\` specified in instructions. If it is a glob pattern, choose the concrete file path using the schema instruction and workspace planning context
    - Show what was created and what's now unlocked
    - STOP after creating ONE artifact
@@ -108,7 +109,7 @@ Common artifact patterns:
   - The Capabilities section is critical - each capability listed will need a spec file.
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+- **tasks.md**: Break down implementation into checkboxed tasks, including which tasks can run concurrently via sub-agent, which must remain sequential, what context each sub-agent receives, and how the main agent integrates evidence/results.
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 
@@ -138,7 +139,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Checklist**: 如果要创建 proposal、design 或 tasks，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束。创建 design 时必须评估复用、边界与职责、质量属性、复杂度例外和验证方式；创建 tasks 时必须把关键架构约束转成可验证任务。
+**Architecture Checklist**: 如果要创建 proposal、design 或 tasks，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束。创建 design 时必须评估复用、边界与职责、质量属性、复杂度例外和验证方式；创建 tasks 时必须把关键架构约束转成可验证任务，并规划可由 sub-agent 并发完成的调研、测试、验证和独立实现切片。
 
 **Input**: Optionally specify a change name after \`/opsx:continue\` (e.g., \`/opsx:continue add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -197,6 +198,7 @@ export function getOpsxContinueCommandTemplate(): CommandTemplate {
      - Read any completed dependency files for context
      - Use \`template\` as the structure - fill in its sections
      - Apply \`context\` and \`rules\` as constraints when writing - but do NOT copy them into the file
+     - If creating tasks.md, include a parallelization/sub-agent plan with dependencies, context inputs, read/edit boundaries, expected outputs, and main-agent merge responsibilities
      - Write to the \`resolvedOutputPath\` specified in instructions. If it is a glob pattern, choose the concrete file path using the schema instruction and workspace planning context
    - Show what was created and what's now unlocked
    - STOP after creating ONE artifact
@@ -232,7 +234,7 @@ Common artifact patterns:
   - The Capabilities section is critical - each capability listed will need a spec file.
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
 - **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
+- **tasks.md**: Break down implementation into checkboxed tasks, including which tasks can run concurrently via sub-agent, which must remain sequential, what context each sub-agent receives, and how the main agent integrates evidence/results.
 
 For other schemas, follow the \`instruction\` field from the CLI output.
 

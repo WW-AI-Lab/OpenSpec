@@ -122,6 +122,9 @@ artifacts:
       - 每个任务必须是 checkbox：`- [ ] X.Y Task description`
       - 任务应小到能在一个 session 中完成
       - 按依赖顺序排列（什么必须先完成？）
+      - 明确哪些任务可由 sub-agent 并发完成，哪些任务必须由主 agent 顺序完成或汇总决策
+      - 为可并发任务写清 context inputs、允许读取/编辑范围、预期产出、汇总方式和冲突边界
+      - 测试、基础调研、影响面分析、独立实现切片和证据收集应优先考虑 sub-agent；共享接口/架构决策/同一文件修改必须先标注依赖与 owner
       - 从 design.md 的 Architecture Assessment 和 Decisions 派生必要验证任务
       - 对架构显著约束增加 contract/integration/e2e、lint/static check、迁移兼容、回滚或关键错误路径验证
       - 不要只有实现任务；如果 design 中有架构约束，必须有对应验证任务
@@ -137,6 +140,11 @@ artifacts:
 
       - [ ] 2.1 Implement data export function
       - [ ] 2.2 Add CSV formatting utilities
+
+      ## 3. Parallelization Plan
+
+      - [ ] 3.1 Delegate test matrix design to a sub-agent using proposal.md, design.md, and specs as context; main agent reviews and integrates results
+      - [ ] 3.2 Run independent module impact analysis in parallel; block shared contract edits until main agent resolves findings
       ```
 
       参考 specs 确定需要构建什么，参考 design 确定如何构建。每个任务都应可验证，完成标准要清晰。
@@ -148,6 +156,9 @@ apply:
   requires: [tasks]
   tracks: tasks.md
   instruction: |
-    读取上下文文件，按顺序完成待办任务，并在完成时标记 checkbox。
+    读取上下文文件，先识别 tasks.md 中的依赖、并发计划和 sub-agent 委派建议，再完成待办任务。
+    对互不冲突的调研、测试、验证或独立实现切片，主 agent 应按 tasks.md 规划指派 sub-agent 并汇总结果。
+    涉及共享接口、架构决策、同一文件修改或未解决依赖的任务必须由主 agent 顺序处理或先完成协调。
+    每个任务完成时标记 checkbox。
     实现时必须遵守 design.md 中的架构决策和验证要求。
     遇到 blocker 或需要澄清时暂停。

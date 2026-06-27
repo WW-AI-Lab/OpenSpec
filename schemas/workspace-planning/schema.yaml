@@ -60,6 +60,7 @@ artifacts:
       创建 workspace coordination task list。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
       按 phase 或 affected area 分组。每个 actionable item 必须是 `- [ ]` checkbox。area-specific implementation tasks 必须标明 affected area；在后续 implementation workflow 选择 allowed edit root 前，任务保持 planning granularity。将 design 中的跨 area 架构约束、handoff、owner、验证和回滚要求转成可检查任务。
+      必须增加并发协调计划：明确哪些 affected area、基础调研、测试设计、验证证据收集或 repo-local implementation planning 可由 sub-agent 并发完成；写清每个 sub-agent 的 context inputs、只读/可编辑边界、预期 output、合并方式和冲突/owner 门槛。跨 area contract、共享配置、owner 变更和最终 source-of-truth 更新必须由主 agent 汇总确认。
     requires:
       - specs
       - design
@@ -69,5 +70,7 @@ apply:
   tracks: tasks.md
   instruction: |
     apply 前先读取 status 和 instructions 输出中的 workspace planning context。
+    先根据 tasks.md 的并发协调计划指派可独立的 sub-agent 做 read-only 调研、affected-area impact analysis、测试/验证证据收集或 repo-local implementation plan 草案。
+    主 agent 必须汇总 sub-agent 结果，解决 owner、handoff、contract 和共享配置冲突后，才推进需要顺序执行的任务。
     做 implementation edits 前，必须选择 affected area 并确认 allowed edit root。
     在显式 implementation context 可用前，将 linked repos 和 folders 视为只读探索上下文。

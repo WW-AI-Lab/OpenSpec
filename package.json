@@ -1,6 +1,6 @@
 {
   "name": "@ww-ai-lab/openspec",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "AI-native system for spec-driven development",
   "keywords": [
     "openspec",

@@ -624,7 +624,8 @@ apply:
       });
       expect(result.exitCode).toBe(0);
       // Should show the instruction from spec-driven schema apply block
-      expect(result.stdout).toContain('按顺序完成待办任务');
+      expect(result.stdout).toContain('先识别 tasks.md 中的依赖、并发计划和 sub-agent 委派建议');
+      expect(result.stdout).toContain('主 agent 应按 tasks.md 规划指派 sub-agent 并汇总结果');
     });
 
     it('shows all_done state when all tasks are complete', async () => {
