@@ -7,14 +7,14 @@ artifacts:
     description: 记录共享目标、范围、受影响区域、能力影响和架构影响初筛的 workspace proposal
     template: proposal.md
     instruction: |
-      创建 workspace-level proposal，用一次文档捕获共享目标、范围和架构影响初筛。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 workspace-level proposal，用一次文档捕获共享目标、范围和架构影响初筛。
 
       章节要求：
       - **Why**：用 1-2 段说明产品目标或问题。
       - **What Changes**：列出跨 area 的行为、工作流或 capability 变化。
       - **Affected Areas**：使用已注册 workspace link name 标明已知受影响 area。仍在探索的范围要说明 unresolved 内容。
       - **Capabilities**：识别需要 specs 的 workspace-scoped capabilities。Area-specific requirements 后续应放在 `specs/<area-or-repo>/<capability>/spec.md`。
-      - **Architecture Impact**：识别跨 area 边界、候选复用点、共享约束、owner、handoff 和可能的 repo-local 落点。
+      - **Architecture Impact**：识别跨 area 边界、候选复用点、共享约束、owner、handoff 和可能的 repo-local 落点。无显著架构影响时一句话说明即可。
       - **Impact**：总结用户影响、规划影响和可能实现归属；不要创建 repo-local artifacts。
 
       在显式 implementation workflow 选择 affected area 前，将 linked repos 和 folders 视为探索上下文。
@@ -25,7 +25,7 @@ artifacts:
     description: 按 affected area 和 capability 组织的 workspace-scoped specs
     template: spec.md
     instruction: |
-      创建 workspace-scoped specification files，定义 WHAT should change。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 workspace-scoped specification files，定义 WHAT should change。
 
       Area-specific requirements 使用 `specs/<area-or-repo>/<capability>/spec.md`。当已注册 area 拥有该 requirement 时，第一个 path segment 应是 registered workspace link name。若 area 未确认，使用 exploratory area name，并在 requirement 或 scenario 中明确 unresolved question。
 
@@ -46,9 +46,9 @@ artifacts:
     description: 跨 area 技术设计、架构评估和协同决策
     template: design.md
     instruction: |
-      创建 workspace planning 的 cross-area design 文档。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 workspace planning 的 cross-area design 文档。
 
-      聚焦影响多个 area 的决策、area 间 handoff、共享约束、owner、顺序风险，以及 workspace plan 如何保持 source of truth。必须评估已有设计复用、边界与职责、质量属性和复杂度例外。避免逐行实现细节；在显式 implementation workflow 提供 allowed edit root 前，不要指示 agent 编辑 linked repos。
+      聚焦影响多个 area 的决策、area 间 handoff、共享约束、owner、顺序风险，以及 workspace plan 如何保持 source of truth。评估已有设计复用、边界与职责和质量属性，深度与跨 area 影响的显著性成正比。避免逐行实现细节；在显式 implementation workflow 提供 allowed edit root 前，不要指示 agent 编辑 linked repos。
     requires:
       - proposal
 
@@ -57,10 +57,9 @@ artifacts:
     description: workspace planning 以及后续 affected-area implementation 的协同任务清单
     template: tasks.md
     instruction: |
-      创建 workspace coordination task list。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 workspace coordination task list。
 
       按 phase 或 affected area 分组。每个 actionable item 必须是 `- [ ]` checkbox。area-specific implementation tasks 必须标明 affected area；在后续 implementation workflow 选择 allowed edit root 前，任务保持 planning granularity。将 design 中的跨 area 架构约束、handoff、owner、验证和回滚要求转成可检查任务。
-      必须增加并发协调计划：明确哪些 affected area、基础调研、测试设计、验证证据收集或 repo-local implementation planning 可由 sub-agent 并发完成；写清每个 sub-agent 的 context inputs、只读/可编辑边界、预期 output、合并方式和冲突/owner 门槛。跨 area contract、共享配置、owner 变更和最终 source-of-truth 更新必须由主 agent 汇总确认。
     requires:
       - specs
       - design
@@ -70,7 +69,8 @@ apply:
   tracks: tasks.md
   instruction: |
     apply 前先读取 status 和 instructions 输出中的 workspace planning context。
-    先根据 tasks.md 的并发协调计划指派可独立的 sub-agent 做 read-only 调研、affected-area impact analysis、测试/验证证据收集或 repo-local implementation plan 草案。
-    主 agent 必须汇总 sub-agent 结果，解决 owner、handoff、contract 和共享配置冲突后，才推进需要顺序执行的任务。
     做 implementation edits 前，必须选择 affected area 并确认 allowed edit root。
     在显式 implementation context 可用前，将 linked repos 和 folders 视为只读探索上下文。
+    每轮开始前重读 tasks.md；每项取得验证证据后立即标记 checkbox，然后再次重读 tasks.md 再选择下一项。
+    主动识别并充分使用 sub-agent 处理互不冲突的调研和验证；跨 area contract、共享配置、owner 变更、最终集成和 checkbox 更新由主 agent 顺序协调。
+    需要用户确认 affected area、edit root 或方向时，给出 2-3 个互斥选项、推荐项及取舍。

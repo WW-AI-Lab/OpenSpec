@@ -6,105 +6,47 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
+const FF_BODY = `快速推进（fast-forward）一个 OpenSpec change：一次性生成开始实现所需的全部规划 artifacts（以 schema 为准）。
+
+**语言**：产出物默认使用简体中文；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**目标**
+
+\`openspec status --change "<name>" --json\` 中 \`applyRequires\` 列出的所有 artifact 状态为 \`done\`，且内容质量足以直接开始实现。
+
+**工具**
+
+\`\`\`bash
+openspec new change "<name>"                                  # 创建 change 脚手架（change 不存在时）
+openspec status --change "<name>" --json                      # artifact 依赖图与状态（ground truth）
+openspec instructions <artifact-id> --change "<name>" --json  # 单个 artifact 的写作指导
+\`\`\`
+
+status 返回 \`artifacts\`（各 artifact 的状态与依赖）、\`applyRequires\`、\`planningHome\`/\`changeRoot\`/\`artifactPaths\`（路径上下文，不要假设 repo-local 路径）。
+instructions 返回 \`template\`（输出结构）、\`instruction\`（该 artifact 的具体要求）、\`resolvedOutputPath\`（写入路径）、\`dependencies\`（写作前应读取的已完成 artifact）、\`context\`/\`rules\`（对你的约束——不要复制进产出文件）。
+
+**工作方式**
+
+1. 明确要做什么。如果用户没有说清楚要构建或修复什么，先问清再开始；从描述派生 kebab-case 名称（如 "add user authentication" → \`add-user-auth\`）。同名 change 已存在时，从其现有 artifacts 继续快进，不要重建。
+2. 先判断变更的架构显著性（是否跨模块、是否改共享契约、是否涉及迁移/安全/性能）。显著变更先阅读本 skill 的 \`references/architecture-guidance.md\`（如可用）并检查现有 specs 与代码模式；简单变更快速推进，artifact 保持极简，不为凑格式编造内容。
+3. 按依赖图产出 artifacts。编排由你决定：依赖已满足的 artifact 可以并行创建（如 specs 和 design 都只依赖 proposal），无需在每个 artifact 之后重复查询状态；收尾时用一次 status 校验 \`applyRequires\` 全部 done。
+
+**不变量**
+
+- 写每个 artifact 前，先读取它的依赖 artifact。
+- delta spec 的结构化格式不可改动（\`## ADDED/MODIFIED/REMOVED/RENAMED Requirements\`、\`### Requirement:\`、\`#### Scenario:\` 四级井号）——archive 合并依赖这些解析。
+- tasks.md 的任务必须是 \`- [ ]\` checkbox，apply 阶段靠它跟踪进度。
+- 关键歧义（会导致方向性返工）先问用户；其余合理决策自行做出，保持推进。
+
+**完成时**
+
+报告 change 名称与位置、创建的 artifacts、下一步（运行 /opsx:apply 或直接要求实现）。表达格式遵循你所在环境的沟通规范。`;
+
 export function getFfChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-ff-change',
     description: 'Fast-forward through OpenSpec artifact creation. Use when the user wants to quickly create all artifacts needed for implementation without stepping through each one individually.',
-    instructions: `快速推进 OpenSpec artifact 创建，一次性生成开始 implementation 所需的规划产物。
-
-**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
-
-**Architecture Guidance**: 在创建 proposal/design/tasks 前，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。生成 artifacts 时必须先评估现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
-
-**Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
-
-**Steps**
-
-1. **If no clear input provided, ask what they want to build**
-
-   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
-   > "What change do you want to work on? Describe what you want to build or fix."
-
-   From their description, derive a kebab-case name (e.g., "add user authentication" → \`add-user-auth\`).
-
-   **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
-
-2. **Create the change directory**
-   \`\`\`bash
-   openspec new change "<name>"
-   \`\`\`
-   This creates a scaffolded change in the planning home resolved by the CLI.
-
-3. **Get the artifact build order**
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
-   Parse the JSON to get:
-   - \`applyRequires\`: array of artifact IDs needed before implementation (e.g., \`["tasks"]\`)
-   - \`artifacts\`: list of all artifacts with their status and dependencies
-   - \`planningHome\`, \`changeRoot\`, \`artifactPaths\`, and \`actionContext\`: path and scope context. Use these instead of assuming repo-local paths.
-
-4. **Create artifacts in sequence until apply-ready**
-
-   Use the **TodoWrite tool** to track progress through the artifacts.
-
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
-
-   a. **For each artifact that is \`ready\` (dependencies satisfied)**:
-      - Get instructions:
-        \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
-        \`\`\`
-      - The instructions JSON includes:
-        - \`context\`: Project background (constraints for you - do NOT include in output)
-        - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - \`template\`: The structure to use for your output file
-        - \`instruction\`: Schema-specific guidance for this artifact type
-        - \`resolvedOutputPath\`: Resolved path or pattern to write the artifact
-        - \`dependencies\`: Completed artifacts to read for context
-      - Read any completed dependency files for context
-      - Create the artifact file using \`template\` as the structure and write it to \`resolvedOutputPath\`
-      - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
-      - Show brief progress: "✓ Created <artifact-id>"
-
-   b. **Continue until all \`applyRequires\` artifacts are complete**
-      - After creating each artifact, re-run \`openspec status --change "<name>" --json\`
-      - Check if every artifact ID in \`applyRequires\` has \`status: "done"\` in the artifacts array
-      - Stop when all \`applyRequires\` artifacts are done
-
-   c. **If an artifact requires user input** (unclear context):
-      - Use **AskUserQuestion tool** to clarify
-      - Then continue with creation
-
-5. **Show final status**
-   \`\`\`bash
-   openspec status --change "<name>"
-   \`\`\`
-
-**Output**
-
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/opsx:apply\` or ask me to implement to start working on the tasks."
-
-**Artifact Creation Guidelines**
-
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
-
-**Guardrails**
-- Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)
-- Always read dependency artifacts before creating a new one
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, suggest continuing that change instead
-- Verify each artifact file exists after writing before proceeding to next`,
+    instructions: FF_BODY,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
     metadata: { author: 'openspec', version: '1.0' },
@@ -117,100 +59,8 @@ export function getOpsxFfCommandTemplate(): CommandTemplate {
     description: 'Create a change and generate all artifacts needed for implementation in one go',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `快速推进 OpenSpec artifact 创建，一次性生成开始 implementation 所需的规划产物。
+    content: `${FF_BODY}
 
-**Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
-
-**Architecture Checklist**: 创建 proposal/design/tasks 前，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束；优先复用已有设计。新增抽象、依赖、服务、存储、协议或跨模块基础设施时，必须在 design.md 中说明理由、替代方案、风险、验证方式和回滚方式，并在 tasks.md 中加入必要验证任务。
-
-**Input**: The argument after \`/opsx:ff\` is the change name (kebab-case), OR a description of what the user wants to build.
-
-**Steps**
-
-1. **If no input provided, ask what they want to build**
-
-   Use the **AskUserQuestion tool** (open-ended, no preset options) to ask:
-   > "What change do you want to work on? Describe what you want to build or fix."
-
-   From their description, derive a kebab-case name (e.g., "add user authentication" → \`add-user-auth\`).
-
-   **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
-
-2. **Create the change directory**
-   \`\`\`bash
-   openspec new change "<name>"
-   \`\`\`
-   This creates a scaffolded change in the planning home resolved by the CLI.
-
-3. **Get the artifact build order**
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
-   Parse the JSON to get:
-   - \`applyRequires\`: array of artifact IDs needed before implementation (e.g., \`["tasks"]\`)
-   - \`artifacts\`: list of all artifacts with their status and dependencies
-   - \`planningHome\`, \`changeRoot\`, \`artifactPaths\`, and \`actionContext\`: path and scope context. Use these instead of assuming repo-local paths.
-
-4. **Create artifacts in sequence until apply-ready**
-
-   Use the **TodoWrite tool** to track progress through the artifacts.
-
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
-
-   a. **For each artifact that is \`ready\` (dependencies satisfied)**:
-      - Get instructions:
-        \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
-        \`\`\`
-      - The instructions JSON includes:
-        - \`context\`: Project background (constraints for you - do NOT include in output)
-        - \`rules\`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - \`template\`: The structure to use for your output file
-        - \`instruction\`: Schema-specific guidance for this artifact type
-        - \`resolvedOutputPath\`: Resolved path or pattern to write the artifact
-        - \`dependencies\`: Completed artifacts to read for context
-      - Read any completed dependency files for context
-      - Create the artifact file using \`template\` as the structure and write it to \`resolvedOutputPath\`
-      - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
-      - Show brief progress: "✓ Created <artifact-id>"
-
-   b. **Continue until all \`applyRequires\` artifacts are complete**
-      - After creating each artifact, re-run \`openspec status --change "<name>" --json\`
-      - Check if every artifact ID in \`applyRequires\` has \`status: "done"\` in the artifacts array
-      - Stop when all \`applyRequires\` artifacts are done
-
-   c. **If an artifact requires user input** (unclear context):
-      - Use **AskUserQuestion tool** to clarify
-      - Then continue with creation
-
-5. **Show final status**
-   \`\`\`bash
-   openspec status --change "<name>"
-   \`\`\`
-
-**Output**
-
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/opsx:apply\` to start implementing."
-
-**Artifact Creation Guidelines**
-
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
-
-**Guardrails**
-- Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)
-- Always read dependency artifacts before creating a new one
-- If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
-- If a change with that name already exists, ask if user wants to continue it or create a new one
-- Verify each artifact file exists after writing before proceeding to next`
+**Input**: The argument after \`/opsx:ff\` is the change name (kebab-case), OR a description of what the user wants to build.`,
   };
 }

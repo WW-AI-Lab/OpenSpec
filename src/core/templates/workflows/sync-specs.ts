@@ -6,87 +6,36 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
-export function getSyncSpecsSkillTemplate(): SkillTemplate {
-  return {
-    name: 'openspec-sync-specs',
-    description: 'Sync delta specs from a change to main specs. Use when the user wants to update main specs with changes from a delta spec, without archiving the change.',
-    instructions: `Sync delta specs from a change to main specs.
+const SYNC_BODY = `把 change 的 delta specs 同步到 main specs。
 
-This is an **agent-driven** operation - you will read delta specs and directly edit main specs to apply the changes. This allows intelligent merging (e.g., adding a scenario without copying the entire requirement).
+这是 **agent-driven** 操作：你读取 delta specs，直接编辑 main specs 完成智能合并（例如只添加一个 scenario 而无需复制整个 requirement）。change 保持 active，实现完成后再 archive。
 
-**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+**语言**：默认使用简体中文输出说明和总结；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Steps**
+**选定 change**
 
-1. **If no change name provided, prompt for selection**
+用户指定则用之；只有一个含 delta specs 的 active change 时自动选用并告知；否则用 \`openspec list --json\` 列出让用户选择。
 
-   Run \`openspec list --json\` to get available changes. Use the **AskUserQuestion tool** to let the user select.
+**获取上下文**
 
-   Show changes that have delta specs (under \`specs/\` directory).
+\`\`\`bash
+openspec status --change "<name>" --json
+\`\`\`
 
-   **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
+- 若 \`actionContext.mode: "workspace-planning"\`：说明 workspace spec sync is not supported in this slice，停止。不要回退到 repo-local 路径或编辑 linked repos。
+- delta spec 文件列表取自 \`artifactPaths.specs.existingOutputPaths\`；没有 delta specs 时告知并停止。
 
-2. **Resolve change context**
+**合并语义**
 
-   Run:
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
+对每个 delta spec，目标是 \`openspec/specs/<capability>/spec.md\`。先读 delta 和 main spec，再应用：
 
-   If status reports \`actionContext.mode: "workspace-planning"\`, explain that workspace spec sync is not supported in this slice and STOP. Do not fall back to repo-local paths or edit linked repos.
+- **ADDED Requirements**：main spec 中不存在则新增；已存在则更新为 delta 内容（视为隐式 MODIFIED）。
+- **MODIFIED Requirements**：定位既有 requirement 应用变化——可以是新增 scenario、修改 scenario 或改描述；delta 未提及的内容保持不变。
+- **REMOVED Requirements**：删除整个 requirement block。
+- **RENAMED Requirements**：按 FROM:/TO: 重命名。
+- capability 的 main spec 不存在时新建（Purpose 可简短，标注 TBD）。
 
-3. **Find delta specs**
-
-   Use \`artifactPaths.specs.existingOutputPaths\` from the status JSON as the list of delta spec files.
-
-   Each delta spec file contains sections like:
-   - \`## ADDED Requirements\` - New requirements to add
-   - \`## MODIFIED Requirements\` - Changes to existing requirements
-   - \`## REMOVED Requirements\` - Requirements to remove
-   - \`## RENAMED Requirements\` - Requirements to rename (FROM:/TO: format)
-
-   If no delta specs found, inform user and stop.
-
-4. **For each delta spec, apply changes to main specs**
-
-   For each repo-local capability delta spec path returned by the CLI:
-
-   a. **Read the delta spec** to understand the intended changes
-
-   b. **Read the main spec** at \`openspec/specs/<capability>/spec.md\` (may not exist yet)
-
-   c. **Apply changes intelligently**:
-
-      **ADDED Requirements:**
-      - If requirement doesn't exist in main spec → add it
-      - If requirement already exists → update it to match (treat as implicit MODIFIED)
-
-      **MODIFIED Requirements:**
-      - Find the requirement in main spec
-      - Apply the changes - this can be:
-        - Adding new scenarios (don't need to copy existing ones)
-        - Modifying existing scenarios
-        - Changing the requirement description
-      - Preserve scenarios/content not mentioned in the delta
-
-      **REMOVED Requirements:**
-      - Remove the entire requirement block from main spec
-
-      **RENAMED Requirements:**
-      - Find the FROM requirement, rename to TO
-
-   d. **Create new main spec** if capability doesn't exist yet:
-      - Create \`openspec/specs/<capability>/spec.md\`
-      - Add Purpose section (can be brief, mark as TBD)
-      - Add Requirements section with the ADDED requirements
-
-5. **Show summary**
-
-   After applying all changes, summarize:
-   - Which capabilities were updated
-   - What changes were made (requirements added/modified/removed/renamed)
-
-**Delta Spec Format Reference**
+Delta 格式参考：
 
 \`\`\`markdown
 ## ADDED Requirements
@@ -98,54 +47,23 @@ The system SHALL do something new.
 - **WHEN** user does X
 - **THEN** system does Y
 
-## MODIFIED Requirements
-
-### Requirement: Existing Feature
-#### Scenario: New scenario to add
-- **WHEN** user does A
-- **THEN** system does B
-
-## REMOVED Requirements
-
-### Requirement: Deprecated Feature
-
 ## RENAMED Requirements
 
 - FROM: \`### Requirement: Old Name\`
 - TO: \`### Requirement: New Name\`
 \`\`\`
 
-**Key Principle: Intelligent Merging**
+**核心原则：智能合并。** Delta 表达的是意图，不是整体替换。用你的判断合理合并；保留 delta 未提及的既有内容；操作应幂等（重复执行结果一致）。不确定时先问再改。
 
-Unlike programmatic merging, you can apply **partial updates**:
-- To add a scenario, just include that scenario under MODIFIED - don't copy existing scenarios
-- The delta represents *intent*, not a wholesale replacement
-- Use your judgment to merge changes sensibly
+**完成时**
 
-**Output On Success**
+按 capability 总结应用的变更（requirements added/modified/removed/renamed）。表达格式遵循你所在环境的沟通规范。`;
 
-\`\`\`
-## Specs Synced: <change-name>
-
-Updated main specs:
-
-**<capability-1>**:
-- Added requirement: "New Feature"
-- Modified requirement: "Existing Feature" (added 1 scenario)
-
-**<capability-2>**:
-- Created new spec file
-- Added requirement: "Another Feature"
-
-Main specs are now updated. The change remains active - archive when implementation is complete.
-\`\`\`
-
-**Guardrails**
-- Read both delta and main specs before making changes
-- Preserve existing content not mentioned in delta
-- If something is unclear, ask for clarification
-- Show what you're changing as you go
-- The operation should be idempotent - running twice should give same result`,
+export function getSyncSpecsSkillTemplate(): SkillTemplate {
+  return {
+    name: 'openspec-sync-specs',
+    description: 'Sync delta specs from a change to main specs. Use when the user wants to update main specs with changes from a delta spec, without archiving the change.',
+    instructions: SYNC_BODY,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
     metadata: { author: 'openspec', version: '1.0' },
@@ -158,141 +76,8 @@ export function getOpsxSyncCommandTemplate(): CommandTemplate {
     description: 'Sync delta specs from a change to main specs',
     category: 'Workflow',
     tags: ['workflow', 'specs', 'experimental'],
-    content: `Sync delta specs from a change to main specs.
+    content: `${SYNC_BODY}
 
-This is an **agent-driven** operation - you will read delta specs and directly edit main specs to apply the changes. This allows intelligent merging (e.g., adding a scenario without copying the entire requirement).
-
-**Input**: Optionally specify a change name after \`/opsx:sync\` (e.g., \`/opsx:sync add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
-
-**Steps**
-
-1. **If no change name provided, prompt for selection**
-
-   Run \`openspec list --json\` to get available changes. Use the **AskUserQuestion tool** to let the user select.
-
-   Show changes that have delta specs (under \`specs/\` directory).
-
-   **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
-
-2. **Resolve change context**
-
-   Run:
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
-
-   If status reports \`actionContext.mode: "workspace-planning"\`, explain that workspace spec sync is not supported in this slice and STOP. Do not fall back to repo-local paths or edit linked repos.
-
-3. **Find delta specs**
-
-   Use \`artifactPaths.specs.existingOutputPaths\` from the status JSON as the list of delta spec files.
-
-   Each delta spec file contains sections like:
-   - \`## ADDED Requirements\` - New requirements to add
-   - \`## MODIFIED Requirements\` - Changes to existing requirements
-   - \`## REMOVED Requirements\` - Requirements to remove
-   - \`## RENAMED Requirements\` - Requirements to rename (FROM:/TO: format)
-
-   If no delta specs found, inform user and stop.
-
-4. **For each delta spec, apply changes to main specs**
-
-   For each repo-local capability delta spec path returned by the CLI:
-
-   a. **Read the delta spec** to understand the intended changes
-
-   b. **Read the main spec** at \`openspec/specs/<capability>/spec.md\` (may not exist yet)
-
-   c. **Apply changes intelligently**:
-
-      **ADDED Requirements:**
-      - If requirement doesn't exist in main spec → add it
-      - If requirement already exists → update it to match (treat as implicit MODIFIED)
-
-      **MODIFIED Requirements:**
-      - Find the requirement in main spec
-      - Apply the changes - this can be:
-        - Adding new scenarios (don't need to copy existing ones)
-        - Modifying existing scenarios
-        - Changing the requirement description
-      - Preserve scenarios/content not mentioned in the delta
-
-      **REMOVED Requirements:**
-      - Remove the entire requirement block from main spec
-
-      **RENAMED Requirements:**
-      - Find the FROM requirement, rename to TO
-
-   d. **Create new main spec** if capability doesn't exist yet:
-      - Create \`openspec/specs/<capability>/spec.md\`
-      - Add Purpose section (can be brief, mark as TBD)
-      - Add Requirements section with the ADDED requirements
-
-5. **Show summary**
-
-   After applying all changes, summarize:
-   - Which capabilities were updated
-   - What changes were made (requirements added/modified/removed/renamed)
-
-**Delta Spec Format Reference**
-
-\`\`\`markdown
-## ADDED Requirements
-
-### Requirement: New Feature
-The system SHALL do something new.
-
-#### Scenario: Basic case
-- **WHEN** user does X
-- **THEN** system does Y
-
-## MODIFIED Requirements
-
-### Requirement: Existing Feature
-#### Scenario: New scenario to add
-- **WHEN** user does A
-- **THEN** system does B
-
-## REMOVED Requirements
-
-### Requirement: Deprecated Feature
-
-## RENAMED Requirements
-
-- FROM: \`### Requirement: Old Name\`
-- TO: \`### Requirement: New Name\`
-\`\`\`
-
-**Key Principle: Intelligent Merging**
-
-Unlike programmatic merging, you can apply **partial updates**:
-- To add a scenario, just include that scenario under MODIFIED - don't copy existing scenarios
-- The delta represents *intent*, not a wholesale replacement
-- Use your judgment to merge changes sensibly
-
-**Output On Success**
-
-\`\`\`
-## Specs Synced: <change-name>
-
-Updated main specs:
-
-**<capability-1>**:
-- Added requirement: "New Feature"
-- Modified requirement: "Existing Feature" (added 1 scenario)
-
-**<capability-2>**:
-- Created new spec file
-- Added requirement: "Another Feature"
-
-Main specs are now updated. The change remains active - archive when implementation is complete.
-\`\`\`
-
-**Guardrails**
-- Read both delta and main specs before making changes
-- Preserve existing content not mentioned in delta
-- If something is unclear, ask for clarification
-- Show what you're changing as you go
-- The operation should be idempotent - running twice should give same result`
+**Input**: Optionally specify a change name after \`/opsx:sync\` (e.g., \`/opsx:sync add-auth\`).`,
   };
 }

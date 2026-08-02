@@ -9,13 +9,13 @@ OpenSpec helps you and your AI coding assistant agree on what to build before an
 **Default quick path (core profile):**
 
 ```text
-/opsx:propose ──► /opsx:apply ──► /opsx:sync ──► /opsx:archive
+/opsx:propose ──► /opsx:apply (implements + closes out)
 ```
 
 **Expanded path (custom workflow selection):**
 
 ```text
-/opsx:new ──► /opsx:ff or /opsx:continue ──► /opsx:apply ──► /opsx:verify ──► /opsx:archive
+/opsx:new ──► /opsx:ff or /opsx:continue ──► /opsx:apply (implements + closes out)
 ```
 
 The default global profile is `core`, which includes `propose`, `explore`, `apply`, `sync`, and `archive`. You can enable the expanded workflow commands with `openspec config profile` and then `openspec update`.
@@ -198,7 +198,7 @@ The system SHALL allow users to choose between light and dark themes.
 - [ ] 3.2 Update components to use CSS variables
 ```
 
-### 3. Implement
+### 3. Implement and close out
 
 ```
 You: /opsx:apply
@@ -209,12 +209,14 @@ AI:  Working through tasks...
      ✓ 1.3 Implemented localStorage persistence
      ✓ 2.1 Created ThemeToggle component
      ...
-     All tasks complete!
+     ✓ All tasks complete and validated
+     ✓ Necessary docs updated
+     ✓ Change archived and scoped Git commit created
 ```
 
-During implementation, if you discover the design needs adjustment, just update the artifact and continue.
+During implementation, if you discover the design needs adjustment, just update the artifact and continue. After each verified task, apply updates and re-reads `tasks.md` before choosing the next task. When all tasks are done, it completes validation, necessary documentation, archive, and a scoped Git commit by default.
 
-### 4. Archive
+### 4. Archive manually when needed
 
 ```
 You: /opsx:archive

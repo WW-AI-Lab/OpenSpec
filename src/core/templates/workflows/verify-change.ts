@@ -14,7 +14,7 @@ export function getVerifyChangeSkillTemplate(): SkillTemplate {
 
 **Language**: 默认使用简体中文输出 verification report。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Guidance**: 验证前先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）。除 completeness/correctness/coherence 外，还要检查实现是否遵守 design.md 中的架构评估、复用策略、边界与职责、质量属性、复杂度例外和验证要求。发现绕过公共边界、重复实现共享能力、无验证覆盖的架构约束时，至少报告 WARNING；如果直接违反 requirement 或关键 design decision，报告 CRITICAL。
+**架构指导**: 验证时可参考本 skill 的 \`references/architecture-guidance.md\`（如可用）。除 completeness/correctness/coherence 外，检查实现是否遵守 design.md 中记录的架构决策：绕过公共边界、重复实现共享能力、架构约束缺少验证覆盖时至少报告 WARNING；直接违反 requirement 或关键 design decision 时报告 CRITICAL。
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -190,7 +190,7 @@ export function getOpsxVerifyCommandTemplate(): CommandTemplate {
 
 **Language**: 默认使用简体中文输出 verification report。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Checklist**: 除 completeness/correctness/coherence 外，还要检查实现是否遵守 design.md 中的架构评估、复用策略、边界与职责、质量属性、复杂度例外和验证要求。发现绕过公共边界、重复实现共享能力、无验证覆盖的架构约束时，至少报告 WARNING；如果直接违反 requirement 或关键 design decision，报告 CRITICAL。
+**架构指导**: 除 completeness/correctness/coherence 外，检查实现是否遵守 design.md 中记录的架构决策：绕过公共边界、重复实现共享能力、架构约束缺少验证覆盖时至少报告 WARNING；直接违反 requirement 或关键 design decision 时报告 CRITICAL。
 
 **Input**: Optionally specify a change name after \`/opsx:verify\` (e.g., \`/opsx:verify add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 

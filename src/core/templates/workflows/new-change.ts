@@ -14,7 +14,7 @@ export function getNewChangeSkillTemplate(): SkillTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Guidance**: 后续创建 proposal/design/tasks 时，先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用），并从现有 specs、模块、接口、共享能力、配置、测试和部署约束出发进行架构评估。创建 tasks.md 时必须规划可并发任务和 sub-agent 委派边界，减少主 agent 非必要上下文负载。
+**架构指导**: 后续创建规划 artifacts 前参考本 skill 的 \`references/architecture-guidance.md\`（如可用）；评估深度与变更显著性成正比。
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -93,7 +93,7 @@ export function getOpsxNewCommandTemplate(): CommandTemplate {
 
 **Language**: 默认使用简体中文输出说明和规划 artifacts。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
 
-**Architecture Checklist**: 后续创建 proposal/design/tasks 时，先检查现有 specs、模块、接口、共享能力、配置、测试和部署约束，并从复用、边界、质量属性和复杂度角度进行架构评估。创建 tasks.md 时必须规划可并发任务和 sub-agent 委派边界，减少主 agent 非必要上下文负载。
+**架构指导**: 后续创建规划 artifacts 时优先复用现有 specs、模块和接口；新增抽象、依赖或基础设施需在 design.md 说明理由，并在 tasks.md 加入对应验证任务；评估深度与变更显著性成正比。
 
 **Input**: The argument after \`/opsx:new\` is the change name (kebab-case), OR a description of what the user wants to build.
 

@@ -42,7 +42,7 @@ New installs default to `core`, which provides:
 Typical flow:
 
 ```text
-/opsx:propose ──► /opsx:apply ──► /opsx:sync ──► /opsx:archive
+/opsx:propose ──► /opsx:apply (implements + closes out)
 ```
 
 ### Expanded/Full Workflow (custom selection)
@@ -61,7 +61,7 @@ openspec update
 When you know what you want to build and just need to execute:
 
 ```text
-/opsx:new ──► /opsx:ff ──► /opsx:apply ──► /opsx:verify ──► /opsx:archive
+/opsx:new ──► /opsx:ff ──► /opsx:apply (implements + closes out)
 ```
 
 **Example conversation:**
@@ -87,13 +87,12 @@ AI:  Working through tasks...
      ✓ Added logout button to header
      ✓ Implemented session clearing
      ✓ Added confirmation dialog
-     All tasks complete!
-
-You: /opsx:archive
-
-AI:  ✓ Merged specs
-     ✓ Archived change
+     ✓ All tasks validated
+     ✓ Merged specs and archived change
+     ✓ Created scoped Git commit
 ```
+
+Apply updates and re-reads `tasks.md` after every verified task, actively uses sub-agents for suitable independent work, and completes validation, necessary documentation, archive, and a scoped Git commit by default. `/opsx:archive` remains available for manual or recovery workflows.
 
 **Best for:** Small to medium features, bug fixes, straightforward changes.
 
@@ -176,11 +175,9 @@ You: /opsx:apply
 
 AI:  Working on fix-login-redirect...
      [Implements the fix]
-     All tasks complete!
-
-You: /opsx:archive
-
-AI:  ✓ Archived fix-login-redirect
+     ✓ All tasks validated
+     ✓ Archived fix-login-redirect
+     ✓ Created scoped Git commit
 
 You: Let's get back to dark mode
 
@@ -222,14 +219,13 @@ Bulk archive detects when multiple changes touch the same specs and resolves con
 
 ### Completing a Change
 
-The recommended completion flow:
+The default completion flow is handled inside apply:
 
 ```text
-/opsx:apply ──► /opsx:verify ──► /opsx:archive
-                    │                 │
-              validates          prompts to sync
-              implementation     if needed
+/opsx:apply ──► validate ──► necessary docs ──► archive ──► scoped Git commit
 ```
+
+The explicit `/opsx:verify`, `/opsx:sync`, and `/opsx:archive` actions remain available when apply closeout was intentionally limited or for recovery and review workflows.
 
 #### Verify: Check Your Work
 
@@ -439,7 +435,7 @@ For full command details and options, see [Commands](commands.md).
 | `/opsx:new` | Start a change scaffold | Expanded mode, explicit artifact control |
 | `/opsx:continue` | Create next artifact | Expanded mode, step-by-step artifact creation |
 | `/opsx:ff` | Create all planning artifacts | Expanded mode, clear scope |
-| `/opsx:apply` | Implement tasks | Ready to write code |
+| `/opsx:apply` | Implement and close out a change | Ready to deliver the planned change |
 | `/opsx:verify` | Validate implementation | Expanded mode, before archiving |
 | `/opsx:sync` | Merge delta specs | Expanded mode, optional |
 | `/opsx:archive` | Complete the change | All work finished |

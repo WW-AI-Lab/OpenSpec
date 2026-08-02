@@ -6,180 +6,71 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
+const APPLY_BODY = `实现 OpenSpec change 中的 tasks。
+
+**语言**：默认使用简体中文输出进度和总结；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+
+**目标**
+
+完成 tasks 文件中的待办任务，实现与 specs/design 一致；以每个任务的验证证据为完成标准，并通过即时更新与重读 tasks 文件保持进度和规划上下文同步。实现全部完成后，继续完成必要验证、文档、归档和 Git 提交，不停在代码修改或口头总结。
+
+**选定 change**
+
+用户指定则用之；只有一个 active change 时自动选用；能从对话上下文推断时用推断结果。以上都不成立时，用 \`openspec list --json\` 列出并让用户选择。开始时说明 "Using change: <name>" 及如何切换。
+
+**获取上下文**
+
+\`\`\`bash
+openspec status --change "<name>" --json              # schemaName、changeRoot、actionContext
+openspec instructions apply --change "<name>" --json  # contextFiles、任务清单、进度、动态指导
+\`\`\`
+
+- \`state: "blocked"\`（缺少 artifacts）：说明缺什么，建议先补齐，停止。
+- \`state: "all_done"\`：跳过实现，直接进入下述“完成闭环”。
+- **Workspace guard**：若 status 报告 \`actionContext.mode: "workspace-planning"\` 且 \`allowedEditRoots\` 为空，说明 full workspace apply is not supported in this slice——linked repos 与 folders 只作只读上下文，请用户通过显式 implementation workflow 选择 affected area，并在编辑任何文件前停止。
+
+开始实现前，读取 \`contextFiles\` 中列出的所有文件（如 proposal/specs/design/tasks，具体以 CLI 输出为准，不要假设文件名）。
+
+**执行循环**
+
+1. 每轮开始前重读 tasks 文件，确认剩余工作、依赖和已记录状态；不要仅依赖此前对规划的记忆。
+2. 主动识别适合 sub-agent 的独立切片。充分使用 sub-agent 执行互不冲突的调研、测试、验证和隔离实现；不得仅因主 agent 能自行完成就跳过明确可并行的工作。为每个 sub-agent 给出清晰范围、允许编辑路径和预期产出。共享文件、共享接口、架构决策、最终集成、验证、checkbox 和交付收尾由主 agent 负责。
+3. 实现当前任务或并行批次，保持改动聚焦；审查并集成 sub-agent 结果。
+4. 运行与当前任务直接相关的测试或具体检查，取得客观完成证据。
+5. 仅在验证通过后，立即在 tasks 文件中把对应 \`- [ ]\` 改为 \`- [x]\`；随后立即重读 tasks 文件，核对最新进度、依赖和全部剩余任务，再选择下一项。
+
+不得凭实现意图或部分测试勾选，不得把 checkbox 更新拖到会话末尾。持续执行，直到全部任务完成或出现无法自行解决的真实阻塞。
+
+**不变量**
+
+- 实现遵守 design.md 中已记录的决策；发现决策不可行时，先提出更新 artifacts，不绕过设计直接实现。
+- 代码变更保持聚焦于任务范围。
+- 错误优先自行修复并重试；连续失败、任务含义不清、或需要用户做方向性决策时才暂停。
+- 需要用户确认时，使用所在环境的用户确认工具（如可用）或清晰提问，给出 2-3 个互斥选项、将推荐项放在最前，并说明各自影响或取舍；不要只问开放式的“下一步怎么办”。
+- 保留工作区中不属于当前 change 的既有改动；归档和提交时只纳入当前范围，不回退或混入无关改动。
+
+**完成闭环**
+
+全部 tasks 验证完成后，默认继续完成以下动作；除非用户明确限定只实施不闭环，或仓库规则、权限、验证失败构成阻塞：
+
+1. 重读 artifacts 和 tasks 文件，核对实现、规格与 checkbox 一致，并运行与变更风险匹配的最终验证。
+2. 更新因行为、API、配置、迁移或使用方式变化而必须调整的文档；不要为无文档影响的变更制造占位内容。
+3. 使用 OpenSpec archive workflow 同步 specs 并归档该 change；若 archive 出现需选择的分支，按上述方式提供确认选项。
+4. 检查归档后的 Git diff，只 stage 当前 change 范围（禁止 \`git add -A\`），创建并核验 scoped Git commit。只有用户明确要求时才执行 push、发布或部署。
+
+**完成或暂停时**
+
+报告进度（N/M tasks complete）、验证结果、归档和 Git 状态。若暂停，说明具体阻塞及上述确认选项。表达格式遵循你所在环境的沟通规范。
+
+**Fluid workflow**：本 skill 可以在任何时刻调用——部分实现后继续、与其他动作交错；实现中发现设计问题时更新 artifacts 再继续，没有 phase 锁定。`;
+
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-apply-change',
-    description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.',
-    instructions: `实现 OpenSpec change 中的 tasks。
-
-**Language**: 默认使用简体中文输出进度和总结。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
-
-**Architecture Guidance**: 实现前先阅读本 skill 的 \`references/architecture-guidance.md\`（如果可用）和 change 的 design.md。代码必须遵守 design.md 中的架构评估、边界、复用策略和验证要求。若实现发现既定架构决策不可行，先暂停并建议更新 artifacts，不要绕过设计约束直接实现。执行前先读取 tasks.md 的并发计划，优先把互不冲突的调研、测试、验证和独立实现切片委派给 sub-agent，并由主 agent 汇总结果、更新 checkbox 和处理共享边界。
-
-**Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
-
-**Steps**
-
-1. **Select the change**
-
-   If a name is provided, use it. Otherwise:
-   - Infer from conversation context if the user mentioned a change
-   - Auto-select if only one active change exists
-   - If ambiguous, run \`openspec list --json\` to get available changes and use the **AskUserQuestion tool** to let the user select
-
-   Always announce: "Using change: <name>" and how to override (e.g., \`/opsx:apply <other>\`).
-
-2. **Check status to understand the schema**
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - \`planningHome\`, \`changeRoot\`, and \`actionContext\`: planning scope and edit constraints
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
-
-3. **Get apply instructions**
-
-   \`\`\`bash
-   openspec instructions apply --change "<name>" --json
-   \`\`\`
-
-   This returns:
-   - \`contextFiles\`: artifact ID -> array of concrete file paths (varies by schema - could be proposal/specs/design/tasks or spec/tests/implementation/docs)
-   - Progress (total, complete, remaining)
-   - Task list with status
-   - Dynamic instruction based on current state
-
-   **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message, suggest using openspec-continue-change
-   - If \`state: "all_done"\`: congratulate, suggest archive
-   - Otherwise: proceed to implementation
-
-   **Workspace guard:** If status JSON reports \`actionContext.mode: "workspace-planning"\` and \`allowedEditRoots\` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
-
-4. **Read context files**
-
-   Read every file path listed under \`contextFiles\` from the apply instructions output.
-   The files depend on the schema being used:
-   - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
-
-5. **Show current progress**
-
-   Display:
-   - Schema being used
-   - Progress: "N/M tasks complete"
-   - Remaining tasks overview
-   - Dynamic instruction from CLI
-
-6. **Plan sub-agent execution**
-
-   Before editing, inspect tasks.md for explicit parallelization/sub-agent guidance:
-   - Identify independent tasks or task groups that can run concurrently without touching the same files, owners, contracts, migrations, or shared configuration
-   - Delegate suitable read-only research, test design, validation evidence collection, and isolated implementation slices to sub-agent when available
-   - Give each sub-agent only the needed context files and a clear expected output; require them to report findings or patches back to the main agent
-   - Keep architecture decisions, shared-interface changes, conflict resolution, final integration, and checkbox updates with the main agent
-   - If tasks.md lacks a parallelization plan, infer safe opportunities conservatively and update tasks.md if the missing plan would affect execution
-
-7. **Implement tasks (loop until done or blocked)**
-
-   For each pending task or safe parallel batch:
-   - Show which task is being worked on
-   - Make the code changes required, or dispatch sub-agent work and review the returned result
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: \`- [ ]\` → \`- [x]\`
-   - Continue to next task
-
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
-
-8. **On completion or pause, show status**
-
-   Display:
-   - Tasks completed this session
-   - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
-   - If paused: explain why and wait for guidance
-
-**Output During Implementation**
-
-\`\`\`
-## Implementing: <change-name> (schema: <schema-name>)
-
-Working on task 3/7: <task description>
-[...implementation happening...]
-✓ Task complete
-
-Delegating parallel tasks 4/7 and 5/7:
-- <sub-agent scope and expected output>
-- <sub-agent scope and expected output>
-[...review and integration...]
-✓ Tasks complete
-
-Working on task 6/7: <task description>
-[...implementation happening...]
-✓ Task complete
-\`\`\`
-
-**Output On Completion**
-
-\`\`\`
-## Implementation Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 7/7 tasks complete ✓
-
-### Completed This Session
-- [x] Task 1
-- [x] Task 2
-...
-
-All tasks complete! Ready to archive this change.
-\`\`\`
-
-**Output On Pause (Issue Encountered)**
-
-\`\`\`
-## Implementation Paused
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 4/7 tasks complete
-
-### Issue Encountered
-<description of the issue>
-
-**Options:**
-1. <option 1>
-2. <option 2>
-3. Other approach
-
-What would you like to do?
-\`\`\`
-
-**Guardrails**
-- Keep going through tasks until done or blocked
-- Always read context files before starting (from the apply instructions output)
-- If task is ambiguous, pause and ask before implementing
-- If implementation reveals issues, pause and suggest artifact updates
-- Keep code changes minimal and scoped to each task
-- Use sub-agent for safe concurrent work when tasks.md identifies independent workstreams; main agent owns final integration and checkbox updates
-- Update task checkbox immediately after completing each task
-- Pause on errors, blockers, or unclear requirements - don't guess
-- Use contextFiles from CLI output, don't assume specific file names
-
-**Fluid Workflow Integration**
-
-This skill supports the "actions on a change" model:
-
-- **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
-- **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly`,
+    description: 'Implement and close out an OpenSpec change through verified tasks, tasks.md checkpoints, sub-agent delegation, final validation, necessary documentation, archive, and a scoped Git commit. Use when the user wants to start or continue implementation or deliver a planned change.',
+    instructions: APPLY_BODY,
     license: 'MIT',
-    compatibility: 'Requires openspec CLI.',
+    compatibility: 'Requires openspec CLI. Default commit closeout also requires a Git worktree; otherwise report the blocker.',
     metadata: { author: 'openspec', version: '1.0' },
   };
 }
@@ -187,176 +78,11 @@ This skill supports the "actions on a change" model:
 export function getOpsxApplyCommandTemplate(): CommandTemplate {
   return {
     name: 'OPSX: Apply',
-    description: 'Implement tasks from an OpenSpec change (Experimental)',
+    description: 'Implement verified tasks and complete documentation, archive, and scoped Git commit closeout (Experimental)',
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
-    content: `实现 OpenSpec change 中的 tasks。
+    content: `${APPLY_BODY}
 
-**Language**: 默认使用简体中文输出进度和总结。命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
-
-**Architecture Checklist**: 实现前先阅读 change 的 design.md。代码必须遵守 design.md 中的架构评估、边界、复用策略和验证要求。若实现发现既定架构决策不可行，先暂停并建议更新 artifacts，不要绕过设计约束直接实现。执行前先读取 tasks.md 的并发计划，优先把互不冲突的调研、测试、验证和独立实现切片委派给 sub-agent，并由主 agent 汇总结果、更新 checkbox 和处理共享边界。
-
-**Input**: Optionally specify a change name (e.g., \`/opsx:apply add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
-
-**Steps**
-
-1. **Select the change**
-
-   If a name is provided, use it. Otherwise:
-   - Infer from conversation context if the user mentioned a change
-   - Auto-select if only one active change exists
-   - If ambiguous, run \`openspec list --json\` to get available changes and use the **AskUserQuestion tool** to let the user select
-
-   Always announce: "Using change: <name>" and how to override (e.g., \`/opsx:apply <other>\`).
-
-2. **Check status to understand the schema**
-   \`\`\`bash
-   openspec status --change "<name>" --json
-   \`\`\`
-   Parse the JSON to understand:
-   - \`schemaName\`: The workflow being used (e.g., "spec-driven")
-   - \`planningHome\`, \`changeRoot\`, and \`actionContext\`: planning scope and edit constraints
-   - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
-
-3. **Get apply instructions**
-
-   \`\`\`bash
-   openspec instructions apply --change "<name>" --json
-   \`\`\`
-
-   This returns:
-   - \`contextFiles\`: artifact ID -> array of concrete file paths (varies by schema)
-   - Progress (total, complete, remaining)
-   - Task list with status
-   - Dynamic instruction based on current state
-
-   **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message, suggest using \`/opsx:continue\`
-   - If \`state: "all_done"\`: congratulate, suggest archive
-   - Otherwise: proceed to implementation
-
-   **Workspace guard:** If status JSON reports \`actionContext.mode: "workspace-planning"\` and \`allowedEditRoots\` is empty, explain that full workspace apply is not supported in this slice. Treat linked repos and folders as read-only context, ask the user to select an affected area through an explicit implementation workflow, and STOP before editing files.
-
-4. **Read context files**
-
-   Read every file path listed under \`contextFiles\` from the apply instructions output.
-   The files depend on the schema being used:
-   - **spec-driven**: proposal, specs, design, tasks
-   - Other schemas: follow the contextFiles from CLI output
-
-5. **Show current progress**
-
-   Display:
-   - Schema being used
-   - Progress: "N/M tasks complete"
-   - Remaining tasks overview
-   - Dynamic instruction from CLI
-
-6. **Plan sub-agent execution**
-
-   Before editing, inspect tasks.md for explicit parallelization/sub-agent guidance:
-   - Identify independent tasks or task groups that can run concurrently without touching the same files, owners, contracts, migrations, or shared configuration
-   - Delegate suitable read-only research, test design, validation evidence collection, and isolated implementation slices to sub-agent when available
-   - Give each sub-agent only the needed context files and a clear expected output; require them to report findings or patches back to the main agent
-   - Keep architecture decisions, shared-interface changes, conflict resolution, final integration, and checkbox updates with the main agent
-   - If tasks.md lacks a parallelization plan, infer safe opportunities conservatively and update tasks.md if the missing plan would affect execution
-
-7. **Implement tasks (loop until done or blocked)**
-
-   For each pending task or safe parallel batch:
-   - Show which task is being worked on
-   - Make the code changes required, or dispatch sub-agent work and review the returned result
-   - Keep changes minimal and focused
-   - Mark task complete in the tasks file: \`- [ ]\` → \`- [x]\`
-   - Continue to next task
-
-   **Pause if:**
-   - Task is unclear → ask for clarification
-   - Implementation reveals a design issue → suggest updating artifacts
-   - Error or blocker encountered → report and wait for guidance
-   - User interrupts
-
-8. **On completion or pause, show status**
-
-   Display:
-   - Tasks completed this session
-   - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
-   - If paused: explain why and wait for guidance
-
-**Output During Implementation**
-
-\`\`\`
-## Implementing: <change-name> (schema: <schema-name>)
-
-Working on task 3/7: <task description>
-[...implementation happening...]
-✓ Task complete
-
-Delegating parallel tasks 4/7 and 5/7:
-- <sub-agent scope and expected output>
-- <sub-agent scope and expected output>
-[...review and integration...]
-✓ Tasks complete
-
-Working on task 6/7: <task description>
-[...implementation happening...]
-✓ Task complete
-\`\`\`
-
-**Output On Completion**
-
-\`\`\`
-## Implementation Complete
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 7/7 tasks complete ✓
-
-### Completed This Session
-- [x] Task 1
-- [x] Task 2
-...
-
-All tasks complete! You can archive this change with \`/opsx:archive\`.
-\`\`\`
-
-**Output On Pause (Issue Encountered)**
-
-\`\`\`
-## Implementation Paused
-
-**Change:** <change-name>
-**Schema:** <schema-name>
-**Progress:** 4/7 tasks complete
-
-### Issue Encountered
-<description of the issue>
-
-**Options:**
-1. <option 1>
-2. <option 2>
-3. Other approach
-
-What would you like to do?
-\`\`\`
-
-**Guardrails**
-- Keep going through tasks until done or blocked
-- Always read context files before starting (from the apply instructions output)
-- If task is ambiguous, pause and ask before implementing
-- If implementation reveals issues, pause and suggest artifact updates
-- Keep code changes minimal and scoped to each task
-- Use sub-agent for safe concurrent work when tasks.md identifies independent workstreams; main agent owns final integration and checkbox updates
-- Update task checkbox immediately after completing each task
-- Pause on errors, blockers, or unclear requirements - don't guess
-- Use contextFiles from CLI output, don't assume specific file names
-
-**Fluid Workflow Integration**
-
-This skill supports the "actions on a change" model:
-
-- **Can be invoked anytime**: Before all artifacts are done (if tasks exist), after partial implementation, interleaved with other actions
-- **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly`
+**Input**: Optionally specify a change name after \`/opsx:apply\` (e.g., \`/opsx:apply add-auth\`).`,
   };
 }

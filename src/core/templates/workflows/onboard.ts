@@ -392,61 +392,53 @@ Save to the \`resolvedOutputPath\` from \`openspec instructions tasks --change "
 
 ---
 
-## Phase 9: Apply (Implementation)
+## Phase 9: Apply and Close Out
 
 **EXPLAIN:**
 \`\`\`
-## Implementation
+## Implementation and Closeout
 
-Now we implement each task, checking them off as we go. I'll announce each one and occasionally note how the specs/design informed the approach.
+Now we implement and verify each task. After every verified task, we update and re-read tasks.md before choosing the next task or sub-agent batch. Once all tasks are complete, apply validates the full change, updates necessary docs, archives it, and creates a scoped Git commit.
 \`\`\`
 
-**DO:** For each task:
+**DO:** Follow the apply contract:
 
-1. Announce: "Working on task N: [description]"
-2. Implement the change in the codebase
-3. Reference specs/design naturally: "The spec says X, so I'm doing Y"
-4. Mark complete in tasks.md: \`- [ ]\` → \`- [x]\`
-5. Brief status: "✓ Task N complete"
+1. Re-read tasks.md and choose the next task or safe parallel batch
+2. Actively use sub-agents for suitable independent research, test, validation, or isolated implementation work
+3. Implement and integrate the current task
+4. Run the task's relevant validation
+5. Only after validation passes, mark it complete in tasks.md: \`- [ ]\` → \`- [x]\`
+6. Immediately re-read tasks.md before selecting more work
 
 Keep narration light—don't over-explain every line of code.
 
 After all tasks:
 
 \`\`\`
-## Implementation Complete
+## Change Complete
 
-All tasks done:
-- [x] Task 1
-- [x] Task 2
-- [x] ...
-
-The change is implemented! One more step—let's archive it.
+- All tasks verified and checked
+- Necessary docs updated
+- Specs synchronized and change archived
+- Scoped Git commit created
 \`\`\`
 
 ---
 
-## Phase 10: Archive
+## Phase 10: Review the Closeout
 
 **EXPLAIN:**
 \`\`\`
-## Archiving
+## Preserved History
 
-When a change is complete, we archive it. The archive path is derived from \`planningHome.changesDir\` and the date.
-
-Archived changes become your project's decision history—you can always find them later to understand why something was built a certain way.
-\`\`\`
-
-**DO:**
-\`\`\`bash
-openspec archive "<name>"
+Apply archived the completed change after validation. The archive path is derived from \`planningHome.changesDir\` and the date, preserving the specifications and decision history next to the scoped Git commit.
 \`\`\`
 
 **SHOW:**
 \`\`\`
 Archived to: \`<planningHome.changesDir>/archive/YYYY-MM-DD-<name>/\`
 
-The change is now part of your project's history. The code is in your codebase, the decision record is preserved.
+The code, updated specs, and decision record are preserved. Use \`/opsx:archive\` only for manual or recovery closeout when apply was intentionally limited.
 \`\`\`
 
 ---
@@ -464,8 +456,7 @@ You just completed a full OpenSpec cycle:
 4. **Specs** - Defined WHAT in detail
 5. **Design** - Decided HOW
 6. **Tasks** - Broke it into steps
-7. **Apply** - Implemented the work
-8. **Archive** - Preserved the record
+7. **Apply** - Implemented, verified, documented, archived, and committed the work
 
 This same rhythm works for any size change—a small fix or a major feature.
 
@@ -479,8 +470,8 @@ This same rhythm works for any size change—a small fix or a major feature.
  |-------------------|--------------------------------------------|
  | \`/opsx:propose\` | Create a change and generate all artifacts |
  | \`/opsx:explore\` | Think through problems before/during work  |
- | \`/opsx:apply\`   | Implement tasks from a change              |
- | \`/opsx:archive\` | Archive a completed change                 |
+ | \`/opsx:apply\`   | Implement and close out a change           |
+ | \`/opsx:archive\` | Manual/recovery archive                    |
 
 **Additional commands:**
 
@@ -531,8 +522,8 @@ If the user says they just want to see the commands or skip the tutorial:
  |--------------------------|--------------------------------------------|
  | \`/opsx:propose <name>\` | Create a change and generate all artifacts |
  | \`/opsx:explore\`        | Think through problems (no code changes)   |
- | \`/opsx:apply <name>\`   | Implement tasks                            |
- | \`/opsx:archive <name>\` | Archive when done                          |
+ | \`/opsx:apply <name>\`   | Implement and close out                    |
+ | \`/opsx:archive <name>\` | Manual/recovery archive                    |
 
 **Additional commands:**
 

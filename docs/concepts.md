@@ -718,27 +718,17 @@ openspec/
 │   └───────┬────────┘                                                         │
 │           │                                                                  │
 │           ▼                                                                  │
-│   ┌────────────────┐                                                         │
-│   │  3. IMPLEMENT  │  /opsx:apply                                            │
-│   │     TASKS      │  Work through tasks, checking them off                  │
-│   │                │◄──── Update artifacts as you learn                      │
-│   └───────┬────────┘                                                         │
-│           │                                                                  │
-│           ▼                                                                  │
-│   ┌────────────────┐                                                         │
-│   │  4. VERIFY     │  /opsx:verify (optional)                                │
-│   │     WORK       │  Check implementation matches specs                     │
-│   └───────┬────────┘                                                         │
-│           │                                                                  │
-│           ▼                                                                  │
 │   ┌────────────────┐     ┌──────────────────────────────────────────────┐    │
-│   │  5. ARCHIVE    │────►│  Delta specs merge into main specs           │    │
-│   │     CHANGE     │     │  Change folder moves to archive/             │    │
-│   └────────────────┘     │  Specs are now the updated source of truth   │    │
-│                          └──────────────────────────────────────────────┘    │
+│   │  3. APPLY &    │────►│  Verify tasks and update necessary docs      │    │
+│   │     CLOSE OUT  │     │  Merge specs and move change to archive/     │    │
+│   │                │     │  Create a scoped Git commit                  │    │
+│   └────────────────┘     └──────────────────────────────────────────────┘    │
+│        /opsx:apply updates artifacts as you learn and closes out by default  │
 │                                                                              │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
+
+`/opsx:verify`, `/opsx:sync`, and `/opsx:archive` remain available as explicit actions when apply closeout is intentionally limited or for review and recovery workflows.
 
 **The virtuous cycle:**
 

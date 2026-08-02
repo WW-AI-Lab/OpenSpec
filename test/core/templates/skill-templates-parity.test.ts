@@ -30,43 +30,43 @@ import {
 import { generateSkillContent } from '../../../src/core/shared/skill-generation.js';
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
-  getExploreSkillTemplate: 'e2765fae6c2e960f4ce07058cfdaa547ff3435d454eacd5e924e38139e97ad52',
-  getNewChangeSkillTemplate: '54cc79ab44cb29de59524735df04d60cf559f5afd0cf3963c135b8288f7eae65',
-  getContinueChangeSkillTemplate: 'ad3eab7f7c898370347dccced87ab6695c03a96e1e96c1386ed68b892d79868a',
-  getApplyChangeSkillTemplate: '5601a7d7a37cf1704d19759680b8a73d73de1f0a7725fde18b0fef853aea2f8f',
-  getFfChangeSkillTemplate: '832d36edf7f9af6db073dfde6a42700d8a8c724a37d07d577040f06d2578c1e9',
-  getSyncSpecsSkillTemplate: '9f02b41227db70875b89eefeb275c769142607dc5b2593f4e606794aed2fdbad',
-  getOnboardSkillTemplate: '4f4b60fea6e3fc7d2185815b2808fad51535fdd00cd4401b32d1536f32fa2b6d',
-  getOpsxExploreCommandTemplate: '4d5e64e3ede6703113cf2fd23b797371ef2407b702478b4f7240fc81cbf2d3a5',
-  getOpsxNewCommandTemplate: '701abe2bf6f1534092b1942648f5c271e4875c246ea14f434bbb4016032a66ac',
-  getOpsxContinueCommandTemplate: 'b66c3a065473c85d281151cff11ef61fd53938cc32c0bcfe39c3aaa0e47d8952',
-  getOpsxApplyCommandTemplate: '40e81fd56eb207fadfa64d7b9fc684299fcd78bf5296383c086b0cd17e62527c',
-  getOpsxFfCommandTemplate: '9209d082672fd758380e08b7d72bc3e3c51a18de0ebe4507da28e88fad1849d0',
-  getArchiveChangeSkillTemplate: 'bdf022ae2cdef1feef4d641a068bef3a7fc5d98a323f7ce9f77ac578fe8d20c6',
+  getExploreSkillTemplate: '6fef69fc6dd688bc2ebd05f3a21970095135787c3727e3528cfc647715b14dc8',
+  getNewChangeSkillTemplate: '4418a01721aa5de3639a90bc759a403e5ff128ae110e51b3049d7f871cdc6fe8',
+  getContinueChangeSkillTemplate: '86cddc6fdda6c820b6de180e3df823203c16b4ef7aecc57c7a98b92420d1058a',
+  getApplyChangeSkillTemplate: '83aeab4ef86c8642f83b837038bfd6a457cdda3d3b8faa7685e0562d60bba10b',
+  getFfChangeSkillTemplate: '1e8c394bc52d91e581c7eefaf35cdc3d18d7c5677381f766cbbddcc52b5024db',
+  getSyncSpecsSkillTemplate: '63f319036ec3e6583ceb22e990c8d7abe424feffb030bfc5b4e7d5ca886c229a',
+  getOnboardSkillTemplate: '50228e9940c9de442ce155b29cb87b0a17c2cbfd241170b0b915fcb9468d0e3e',
+  getOpsxExploreCommandTemplate: '0b13822c126033b97cb57bddd3731e0de2d1b70233f97958c3f65fed56494582',
+  getOpsxNewCommandTemplate: '06f16655ea0f2d95a8bd9b680055ae38be3431c7fb179dc881b56d32ba4ec1d9',
+  getOpsxContinueCommandTemplate: '48e29dc513fb75383eed857e471916777326b20440e07193d0ddb4076f8b92ef',
+  getOpsxApplyCommandTemplate: '763b628927a6137d68e131199ddf5d57b3de992138aad35d46cafbdbdb48f160',
+  getOpsxFfCommandTemplate: 'a30bb9d4a585d6496feffc926344154a88e0fd99ad975ff128e679d6f9e64d14',
+  getArchiveChangeSkillTemplate: 'ba480cbc8f15008fc8cf8aec441355ad0749834af60273a7c89609fa7bd29e45',
   getBulkArchiveChangeSkillTemplate: 'fdb1715804e86de85be96222b8efeb9d5b350c6d5c19e343e244655deff8e62b',
-  getOpsxSyncCommandTemplate: '4c8118afaea79ff4fed3d946c88e6a7abbba904a5fbf643e4372da1e3735a467',
-  getVerifyChangeSkillTemplate: 'eff9d520f1557fcf224f0cee7546e19cd5ab5eafedfbc929cc14795036dfd206',
-  getOpsxArchiveCommandTemplate: '5181ec2f59c9f0f3376e61d952ed4be976cbd01595b6b0d5e67466c8bd6bac6d',
-  getOpsxOnboardCommandTemplate: '57c1f3e2590bda8f47818bab1d528456c1b8a9a7501f63ab9e2115e0cfaf6f35',
+  getOpsxSyncCommandTemplate: 'e2fdf4ff4ba19a1702d1ac3d9ef6894a2c139954d4666cd0addd90f7b58636f4',
+  getVerifyChangeSkillTemplate: 'b18b51d56120c38bc4445a77073dce124e361abd6113a6c6099829aed2d63003',
+  getOpsxArchiveCommandTemplate: 'bb28bbee36f07ca81a1b2e4bba6bd045abed113f7075aacbdb522193e80e744d',
+  getOpsxOnboardCommandTemplate: '1f9a80683efa89e7e90c59f84efcae3ed31be5b8692666e514b2d1211f8f005d',
   getOpsxBulkArchiveCommandTemplate: 'b76c421023ccb5a12867c349f27cdb186234b692c1811980fb94127567bdabda',
-  getOpsxVerifyCommandTemplate: '7778c1c37ae89f39bc82a952fe1ad19277cc5ea093412fc029805e7e3d88dcf2',
-  getOpsxProposeSkillTemplate: 'e8214a875a57d542b7c2aea32a3068d6175ca61b075892f03897ccec6bc99541',
-  getOpsxProposeCommandTemplate: 'd4e9919407601c085fdf83340e3ad2ad72b198595734d66cda80b21aa32dd2c5',
+  getOpsxVerifyCommandTemplate: '677ea55129a918bc7790db5d3cc0b3fbd5922036728ba8d1071a5535b44dee80',
+  getOpsxProposeSkillTemplate: '3ee2c9ea16f4dca214b2c5abb866b5f71f7c182c4ec4286dc0679154675b2840',
+  getOpsxProposeCommandTemplate: 'bd8498790fdea65be1713d327cc69d5e3f5106d0dd37b624e37e4ee0bb0055f7',
   getFeedbackSkillTemplate: 'd7d83c5f7fc2b92fe8f4588a5bf2d9cb315e4c73ec19bcd5ef28270906319a0d',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
-  'openspec-explore': '28d900ef82b325beb65e69ee6435949adcfdf14a4314638e7006e6dc359b92d4',
-  'openspec-new-change': '75639f6c3e300d7454cdc8ee8efe1ea6d7a5f34980bc2aadd911371d1c5b6176',
-  'openspec-continue-change': 'bb5e26520c0c42fb6dc7f18cb35c8b750fa6890e7c25c63eeb8c1a4b26b1a3c2',
-  'openspec-apply-change': '87864ffdb3a7db50e51ec02c1ae39d786fbfd32c2fa2485a59510d6d726d1a17',
-  'openspec-ff-change': '9714b6f2d3b08a3fe68e8b3272188800ecaffbaabcf64d267ef03e819f276b33',
-  'openspec-sync-specs': '2e0f67ec6fadffc6107b4b1a28eef23a99a6649e5fae706897ea1dd9deb852a8',
-  'openspec-archive-change': '8d14af2c8b2e4358308ac9fc14f75db42a4b41a07e175825035852a82479793e',
+  'openspec-explore': 'faa1cc4c2adc4ba77cc28e290185c171828389c34d53c6d13f771a0f17dd7653',
+  'openspec-new-change': '3f340ed1190da55cb212c4e80ef488ddf1efb3e67c847cd95e01774ac3032cd9',
+  'openspec-continue-change': 'c7c5e76e9d841ee0b08c724ec11a54afe23130e624a181e88230a5be1c39bde2',
+  'openspec-apply-change': '92627d618494ae7ab4f586839bf3c3e4348c5c418326c4936aa51fdadb2c0fc4',
+  'openspec-ff-change': '511bd7527a83bbac1ac2d3a8d08057007ea393599eb2390169353ca7437a3e2b',
+  'openspec-sync-specs': 'f8e490b9bfa02bba017e3bf8a86ecd34eb0348dace4beca8293e0080be1f1f4e',
+  'openspec-archive-change': '5197a0476cbd97052c90b1cfe052de39842fbb8eadcc2b33f2accc2955b31039',
   'openspec-bulk-archive-change': '16207683996b1952559cd4e33463f28fb097761f2c5d912107733d01a90d3f2f',
-  'openspec-verify-change': 'cb6d2ed372744c55cab9a42c0196c36e95d9fb9282d86bacd9a3cc9b5845272f',
-  'openspec-onboard': 'b924ea3c97543ebb7ee82c5f194afe7ce87a521c32b85616f445240ab33a02ab',
-  'openspec-propose': '9ed2940fbff70a0da7f135f2357713e16394f253d0c6941588e1ac9f9569cc4b',
+  'openspec-verify-change': '6659f750478363d2cfc51c55889c64092cd8efa39d17c9e07d9f2baa2d1da44f',
+  'openspec-onboard': '1981f775fabd1837bb4f5d7839708c0d2802c04d07679d64baa7a7f339b265e6',
+  'openspec-propose': 'e6bfb6f4eaff62a103ce911422f248c1f19248abf2eae18eb955b4a94db1ff2f',
 };
 
 function stableStringify(value: unknown): string {
@@ -170,15 +170,39 @@ describe('skill templates split parity', () => {
     }
   });
 
-  it('requires proposal and apply workflows to plan safe sub-agent delegation', () => {
+  it('keeps contract-style invariants in propose and apply workflows', () => {
     const proposeContent = generateSkillContent(getOpsxProposeSkillTemplate(), 'PARITY-BASELINE');
     const applyContent = generateSkillContent(getApplyChangeSkillTemplate(), 'PARITY-BASELINE');
+    const applyCommandContent = getOpsxApplyCommandTemplate().content;
+    const applyTemplate = getApplyChangeSkillTemplate();
+    const applyCommandTemplate = getOpsxApplyCommandTemplate();
     const continueContent = generateSkillContent(getContinueChangeSkillTemplate(), 'PARITY-BASELINE');
+    const onboardContent = generateSkillContent(getOnboardSkillTemplate(), 'PARITY-BASELINE');
 
-    expect(proposeContent).toContain('If creating tasks.md, include a parallelization/sub-agent plan');
-    expect(proposeContent).toContain('When writing tasks.md, preserve checkbox syntax and make concurrency explicit');
-    expect(continueContent).toContain('which tasks can run concurrently via sub-agent');
-    expect(applyContent).toContain('Plan sub-agent execution');
-    expect(applyContent).toContain('Keep architecture decisions, shared-interface changes, conflict resolution, final integration, and checkbox updates with the main agent');
+    // Propose: orchestration is delegated to the agent, format invariants are preserved.
+    expect(proposeContent).toContain('编排由你决定');
+    expect(proposeContent).toContain('## ADDED/MODIFIED/REMOVED/RENAMED Requirements');
+    expect(proposeContent).toContain('- [ ]');
+    // Apply: both generated surfaces preserve the verified checkpoint and closeout contract.
+    for (const content of [applyContent, applyCommandContent]) {
+      expect(content).toContain('仅在验证通过后');
+      expect(content).toContain('随后立即重读 tasks 文件');
+      expect(content).toContain('主动识别适合 sub-agent 的独立切片');
+      expect(content).toContain('checkbox 和交付收尾由主 agent 负责');
+      expect(content).toContain('2-3 个互斥选项');
+      expect(content).toContain('将推荐项放在最前');
+      expect(content).toContain('必要验证、文档、归档和 Git 提交');
+      expect(content).toContain('scoped Git commit');
+      expect(content).toContain('跳过实现，直接进入下述“完成闭环”');
+    }
+    expect(applyTemplate.description).toContain('Implement and close out');
+    expect(applyTemplate.compatibility).toContain('requires a Git worktree');
+    expect(applyCommandTemplate.description).toContain('scoped Git commit closeout');
+    expect(onboardContent).toContain('Apply and Close Out');
+    expect(onboardContent).toContain('Immediately re-read tasks.md');
+    expect(onboardContent).toContain('Manual/recovery archive');
+    expect(onboardContent).not.toContain("One more step—let's archive it");
+    // Continue: no forced parallelization plan in tasks guidance.
+    expect(continueContent).not.toContain('parallelization/sub-agent plan');
   });
 });

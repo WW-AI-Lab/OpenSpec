@@ -162,7 +162,7 @@ rules:
 | `/opsx:new` | Start a new change scaffold (expanded workflow) |
 | `/opsx:continue` | Create the next artifact (expanded workflow) |
 | `/opsx:ff` | Fast-forward planning artifacts (expanded workflow) |
-| `/opsx:apply` | Implement tasks, updating artifacts as needed |
+| `/opsx:apply` | Implement verified tasks and complete docs/archive/scoped commit closeout |
 | `/opsx:verify` | Validate implementation against artifacts (expanded workflow) |
 | `/opsx:sync` | Sync delta specs to main (default workflow, optional) |
 | `/opsx:archive` | Archive when done |
@@ -206,11 +206,11 @@ Creates all planning artifacts at once. Use when you have a clear picture of wha
 ```
 /opsx:apply
 ```
-Works through tasks, checking them off as you go. If you're juggling multiple changes, you can run `/opsx:apply <name>`; otherwise it should infer from the conversation and prompt you to choose if it can't tell.
+Works through tasks using a verified checkpoint loop: validate the current task, update its checkbox immediately, re-read `tasks.md`, and then choose the next task or sub-agent batch. If you're juggling multiple changes, you can run `/opsx:apply <name>`; otherwise it should infer from the conversation and prompt you to choose if it can't tell. Once all tasks are complete, apply proceeds through final validation, necessary docs, archive, and a scoped Git commit by default.
 
 ### Finish up
 ```
-/opsx:archive   # Move to archive when done (prompts to sync specs if needed)
+/opsx:archive   # Manual/recovery archive when apply closeout was intentionally skipped
 ```
 
 ## When to Update vs. Start Fresh
@@ -313,7 +313,7 @@ Think of it like git branches:
 ## Architecture Deep Dive
 
 This section explains how OPSX works under the hood and how it compares to the legacy workflow.
-Examples in this section use the expanded command set (`new`, `continue`, etc.); default `core` users can map the same flow to `propose → apply → sync → archive`.
+Examples in this section use the expanded command set (`new`, `continue`, etc.); default `core` users can map the same flow to `propose → apply`, with apply performing the closeout by default.
 
 ### Philosophy: Phases vs Actions
 
@@ -541,7 +541,7 @@ Artifacts form a directed acyclic graph (DAG). Dependencies are **enablers**, no
 **OPSX** — natural iteration:
 
 ```
-  /opsx:new ───► /opsx:continue ───► /opsx:apply ───► /opsx:archive
+  /opsx:new ───► /opsx:continue ───► /opsx:apply (default closeout)
       │                │                  │
       │                │                  ├── "The design is wrong"
       │                │                  │

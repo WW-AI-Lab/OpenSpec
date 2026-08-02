@@ -61,12 +61,12 @@ AI:  Implementing tasks...
      ✓ 1.2 Create toggle component
      ✓ 2.1 Add CSS variables
      ✓ 2.2 Wire up localStorage
-     All tasks complete!
-
-You: /opsx:archive
-AI:  Archived to openspec/changes/archive/2025-01-23-add-dark-mode/
-     Specs updated. Ready for the next feature.
+     ✓ Validation passed and necessary docs updated
+     ✓ Archived to openspec/changes/archive/2025-01-23-add-dark-mode/
+     ✓ Created a scoped Git commit
 ```
+
+`/opsx:apply` keeps `tasks.md` synchronized after every verified task and, by default, completes validation, documentation, archive, and a scoped Git commit. Use `/opsx:archive` directly when implementation was intentionally completed outside the apply workflow.
 
 <details>
 <summary><strong>OpenSpec Dashboard</strong></summary>

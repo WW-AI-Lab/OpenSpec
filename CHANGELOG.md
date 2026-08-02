@@ -1,5 +1,14 @@
 # @ww-ai-lab/openspec
 
+## 1.5.0
+
+### Minor Changes
+
+- **Contract-style default skills for frontier models** — Rewrote the core workflow skills (`explore`, `propose`, `apply`, `sync`, `archive`) and `ff` from step-by-step scripts into contract-style instructions (goal + invariants + tools + acceptance), letting high-reasoning models own orchestration. Skills no longer prescribe output formats, per-artifact status re-checks, or serial artifact creation. See `docs/skills-design-for-frontier-models.md` for the design rationale.
+- **Progressive rigor encoded into defaults** — Removed the mandatory Parallelization Plan section from `tasks.md` templates; concurrency is now a runtime judgment in `apply` instead of a planning artifact. `proposal`/`design` instructions scale evaluation depth with architectural significance, so trivial changes stay minimal and no placeholder documents get fabricated.
+- **Single source of truth for guidance** — Deduplicated language and architecture guidance that was previously injected four times (skill body, command body, schema instructions, references). `references/architecture-guidance.md` remains the authoritative copy with a new significance-grading section; skills carry only a one-line pointer.
+- **Verified apply checkpoints and closeout** — Apply now validates each task before immediately updating and re-reading `tasks.md`, actively uses sub-agents for suitable independent work, offers bounded confirmation choices, and defaults to final validation, necessary docs, archive, and a scoped Git commit.
+
 ## 1.4.1
 
 ### Patch Changes

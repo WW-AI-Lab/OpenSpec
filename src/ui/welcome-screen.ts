@@ -27,7 +27,7 @@ function getWelcomeText(): string[] {
     chalk.white('Quick start after setup:'),
     `  ${chalk.yellow('/opsx:new')}      ${chalk.dim('Create a change')}`,
     `  ${chalk.yellow('/opsx:continue')} ${chalk.dim('Next artifact')}`,
-    `  ${chalk.yellow('/opsx:apply')}    ${chalk.dim('Implement tasks')}`,
+    `  ${chalk.yellow('/opsx:apply')}    ${chalk.dim('Implement and close out')}`,
     '',
     chalk.cyan('Press Enter to select tools...'),
   ];

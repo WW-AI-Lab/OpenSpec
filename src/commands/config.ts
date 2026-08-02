@@ -69,8 +69,8 @@ const WORKFLOW_PROMPT_META: Record<string, WorkflowPromptMeta> = {
     description: 'Resume work on an existing change',
   },
   apply: {
-    name: 'Apply tasks',
-    description: 'Implement tasks from the current change',
+    name: 'Apply and close out',
+    description: 'Implement verified tasks, then complete docs, archive, and scoped commit',
   },
   ff: {
     name: 'Fast-forward',

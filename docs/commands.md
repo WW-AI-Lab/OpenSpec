@@ -12,7 +12,7 @@ For workflow patterns and when to use each command, see [Workflows](workflows.md
 |---------|---------|
 | `/opsx:propose` | Create a change and generate planning artifacts in one step |
 | `/opsx:explore` | Think through ideas before committing to a change |
-| `/opsx:apply` | Implement tasks from the change |
+| `/opsx:apply` | Implement verified tasks and complete docs/archive/scoped commit closeout |
 | `/opsx:sync` | Merge delta specs into main specs |
 | `/opsx:archive` | Archive a completed change |
 
@@ -267,7 +267,7 @@ AI:  Fast-forwarding add-dark-mode...
 
 ### `/opsx:apply`
 
-Implement tasks from the change. Works through the task list, writing code and checking off items.
+Implement and close out a change. It works through the task list, verifies each item, updates and re-reads `tasks.md` immediately, and uses sub-agents for suitable independent work.
 
 **Syntax:**
 ```
@@ -281,9 +281,11 @@ Implement tasks from the change. Works through the task list, writing code and c
 
 **What it does:**
 - Reads `tasks.md` and identifies incomplete tasks
-- Works through tasks one by one
-- Writes code, creates files, runs tests as needed
-- Marks tasks complete with checkboxes `[x]`
+- Actively delegates suitable independent research, test, validation, and implementation slices while keeping shared integration with the main agent
+- Writes code, creates files, and validates each task before marking its checkbox `[x]`
+- Re-reads `tasks.md` after every completed task before choosing subsequent work
+- After all tasks complete, runs final validation, updates necessary docs, archives the change, and creates a scoped Git commit by default
+- Presents 2-3 concrete options with a recommendation when a real user decision is required
 
 **Example:**
 ```
@@ -573,9 +575,9 @@ Guided onboarding through the complete OpenSpec workflow. An interactive tutoria
 5. Creating specs
 6. Writing the design
 7. Creating tasks
-8. Implementing tasks (`/opsx:apply`)
-9. Verifying implementation
-10. Archiving the change
+8. Implementing and verifying tasks (`/opsx:apply`)
+9. Completing docs/archive/scoped commit closeout
+10. Reviewing the preserved history
 11. Summary and next steps
 
 **Example:**
@@ -586,7 +588,7 @@ AI:  Welcome to OpenSpec!
 
      I'll walk you through the complete workflow using your actual codebase.
      We'll find something small to improve, create a proper change for it,
-     implement it, and archive it.
+     implement it, and close it out.
 
      Let me scan your codebase for opportunities...
 

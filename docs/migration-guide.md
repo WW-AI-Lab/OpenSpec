@@ -286,7 +286,7 @@ Command availability is profile-dependent:
 |---------|---------|
 | `/opsx:propose` | Create a change and generate planning artifacts in one step |
 | `/opsx:explore` | Think through ideas with no structure |
-| `/opsx:apply` | Implement tasks from tasks.md |
+| `/opsx:apply` | Implement verified tasks and complete docs/archive/scoped commit closeout |
 | `/opsx:archive` | Finalize and archive the change |
 
 **Expanded workflow (custom selection):**
@@ -578,7 +578,7 @@ project/
 
 ```text
 /opsx:propose      Start quickly (default core profile)
-/opsx:apply        Implement tasks
+/opsx:apply        Implement and close out
 /opsx:archive      Finish and archive
 
 # Expanded workflow (if enabled):

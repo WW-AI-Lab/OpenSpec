@@ -7,22 +7,16 @@ artifacts:
     description: 说明变更动机、范围、能力影响和架构影响初筛的初始提案
     template: proposal.md
     instruction: |
-      创建 proposal 文档，先说明 WHY/WHAT，再做轻量架构影响初筛。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 proposal 文档，说明 WHY/WHAT 和影响范围；具体 HOW 放入 design.md。保持简洁（1-2 页）。
 
       章节要求：
       - **Why**：用 1-2 段说明问题或机会。它解决什么问题？为什么现在要做？
       - **What Changes**：用 bullet list 描述变更内容，明确新增、修改或移除的能力。破坏性变更标记 **BREAKING**。
-      - **Capabilities**：识别需要创建或修改的 specs：
-        - **New Capabilities**：列出新增 capability。每一项会对应 `specs/<name>/spec.md`。名称使用 kebab-case（例如 `user-auth`、`data-export`）。
-        - **Modified Capabilities**：列出现有 capability 中 REQUIREMENTS 会变化的项。只在 spec-level 行为变化时列出，不包含纯实现细节。每项需要 delta spec file。先检查 `openspec/specs/` 中已有 spec 名称。
-      - **Architecture Impact**：做架构影响初筛，识别相关现有 specs、模块、共享能力、数据模型、配置、部署或测试模式；不要在 proposal 中展开具体实现。
+      - **Capabilities**：识别需要创建或修改的 specs（这是 proposal 与 specs 阶段之间的契约，填写前必须先检查 `openspec/specs/` 中的现有 specs）：
+        - **New Capabilities**：新增 capability，每一项对应 `specs/<name>/spec.md`，名称使用 kebab-case（例如 `user-auth`、`data-export`）。
+        - **Modified Capabilities**：现有 capability 中 REQUIREMENTS 会变化的项。只在 spec-level 行为变化时列出，不包含纯实现细节。
+      - **Architecture Impact**：架构影响初筛——识别相关的现有模块、共享能力、数据模型、配置或部署约束。无显著架构影响时一句话说明即可，不要为凑格式展开。
       - **Impact**：受影响的代码、API、依赖或系统。
-
-      重要：Capabilities 是 proposal 与 specs 阶段之间的契约。填写前必须先检查现有 specs。这里列出的每个 capability 都需要对应 spec file。
-
-      保持简洁（1-2 页）。proposal 关注 WHY/WHAT 和影响范围，具体 HOW 放入 design.md。
-
-      这是后续 specs、design 和 tasks 的基础。
     requires: []
 
   - id: specs
@@ -30,30 +24,25 @@ artifacts:
     description: 定义变更 WHAT 的详细规格
     template: spec.md
     instruction: |
-      创建 specification files，定义系统应该做什么。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
-
-      按 proposal 的 Capabilities section，为每个 capability 创建一个 spec file。
+      创建 specification files，定义系统应该做什么。按 proposal 的 Capabilities section，为每个 capability 创建一个 spec file。
       - New capabilities：使用 proposal 中完全一致的 kebab-case 名称（specs/<capability>/spec.md）。
-      - Modified capabilities：使用 `openspec/specs/<capability>/` 中已有 spec folder 名称，在 `specs/<capability>/spec.md` 创建 delta spec。
+      - Modified capabilities：使用 `openspec/specs/<capability>/` 中已有 spec folder 名称，创建 delta spec。
 
-      Delta operations（必须使用以下英文 ## headers）：
+      Delta operations（必须使用以下英文 ## headers，archive 合并依赖这些解析）：
       - **ADDED Requirements**：新增 capability 或 requirement
       - **MODIFIED Requirements**：行为变化，必须包含完整更新后的 requirement 内容
       - **REMOVED Requirements**：废弃能力，必须包含 **Reason** 和 **Migration**
       - **RENAMED Requirements**：仅名称变化，使用 FROM:/TO: 格式
 
       格式要求：
-      - 每个 requirement：`### Requirement: <name>` 后跟描述
-      - 规范性要求使用 SHALL/MUST（避免 should/may）
-      - 每个 scenario：`#### Scenario: <name>`，使用 WHEN/THEN 格式
+      - 每个 requirement：`### Requirement: <name>` 后跟描述，规范性要求使用 SHALL/MUST
+      - 每个 requirement 至少一个 scenario：`#### Scenario: <name>`，使用 WHEN/THEN 格式
       - **CRITICAL**：Scenario 必须使用 4 个井号（`####`）。使用 3 个井号或 bullet 会导致解析失败。
-      - 每个 requirement 必须至少有一个 scenario。
 
       MODIFIED requirements 工作流：
       1. 在 `openspec/specs/<capability>/spec.md` 中找到现有 requirement
       2. 复制完整 requirement block（从 `### Requirement:` 到所有 scenarios）
-      3. 粘贴到 `## MODIFIED Requirements` 下，并修改为新行为
-      4. 确保 header text 完全匹配（忽略空白）
+      3. 粘贴到 `## MODIFIED Requirements` 下，并修改为新行为（header text 需完全匹配，忽略空白）
 
       常见错误：在 MODIFIED 中只写部分内容会在 archive 时丢失细节。如果只是增加新关注点而不改变既有行为，使用 ADDED。
 
@@ -84,27 +73,12 @@ artifacts:
     description: 说明技术方案、架构评估、关键决策和取舍的设计文档
     template: design.md
     instruction: |
-      创建 design 文档，说明 HOW，并从架构角度评估方案。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 design 文档，说明 HOW。评估深度与变更的架构显著性成正比：
 
-      何时需要 design.md（任一条件满足即创建）：
-      - 跨多个服务/模块的变更，或引入新的架构模式
-      - 新外部依赖，或重要数据模型变化
-      - 涉及安全、性能、迁移、部署或兼容性复杂度
-      - 编码前需要明确技术决策的模糊点
-      - proposal 的 Architecture Impact 显示存在共享能力、边界、所有权或质量属性影响
+      - **显著变更**（跨模块、改共享契约、新依赖、涉及迁移/安全/性能/兼容性，或存在需要取舍的技术决策）：完整展开各章节——先评估能否复用已有 specs、模块、接口、配置和测试模式，再决定是否新增抽象、依赖、服务、存储或协议；记录关键决策及替代方案（为什么选 X 而不是 Y）；把关键架构约束转化为 tasks 中可验证的工作。
+      - **简单变更**（在既有模式内的局部修改，无新决策）：极简即可——在 Context 中一两句话说明复用现状，其余章节标注 N/A。不要为凑格式编造内容。
 
-      章节要求：
-      - **Context**：背景、当前状态、约束、stakeholders
-      - **Goals / Non-Goals**：本设计要达成和明确排除的内容
-      - **Architecture Assessment**：复用现有设计、边界与职责、方案选择、质量属性、复杂度与例外
-      - **Decisions**：关键技术选择与理由（为什么选 X 而不是 Y），每个决策包含替代方案
-      - **Risks / Trade-offs**：已知限制、风险与缓解方式。格式：[Risk] -> Mitigation
-      - **Migration Plan**：部署步骤和回滚策略（如适用）
-      - **Open Questions**：待解决问题
-
-      重点是架构和方案，不是逐行实现。必须先评估能否复用已有 specs、模块、接口、服务、配置、测试模式和部署约束，再决定是否新增抽象、依赖、服务、存储或协议。
-
-      好的 design 文档解释技术决策背后的 why，并把关键架构约束转化为后续 tasks 中可验证的工作。
+      重点是架构和方案，不是逐行实现。好的 design 文档解释技术决策背后的 why。
     requires:
       - proposal
 
@@ -113,21 +87,15 @@ artifacts:
     description: 可跟踪的实现与验证任务清单
     template: tasks.md
     instruction: |
-      创建 task list，将实现工作和必要验证拆成可跟踪任务。默认使用简体中文撰写；命令、路径、代码标识符、API 名称、JSON/YAML key 保持英文。
+      创建 task list，将实现工作和必要验证拆成可跟踪任务。
 
       **IMPORTANT: 必须严格遵循模板格式。** apply 阶段会解析 checkbox 来跟踪进度。未使用 `- [ ]` 的任务不会被跟踪。
 
       指导原则：
       - 相关任务放在 `##` 编号 heading 下
       - 每个任务必须是 checkbox：`- [ ] X.Y Task description`
-      - 任务应小到能在一个 session 中完成
-      - 按依赖顺序排列（什么必须先完成？）
-      - 明确哪些任务可由 sub-agent 并发完成，哪些任务必须由主 agent 顺序完成或汇总决策
-      - 为可并发任务写清 context inputs、允许读取/编辑范围、预期产出、汇总方式和冲突边界
-      - 测试、基础调研、影响面分析、独立实现切片和证据收集应优先考虑 sub-agent；共享接口/架构决策/同一文件修改必须先标注依赖与 owner
-      - 从 design.md 的 Architecture Assessment 和 Decisions 派生必要验证任务
-      - 对架构显著约束增加 contract/integration/e2e、lint/static check、迁移兼容、回滚或关键错误路径验证
-      - 不要只有实现任务；如果 design 中有架构约束，必须有对应验证任务
+      - 任务应小到能在一个 session 中完成，按依赖顺序排列
+      - 如果 design.md 中有架构决策或约束，为其增加对应验证任务（如 contract/integration 测试、迁移兼容、回滚验证）；简单变更不需要额外仪式
 
       Example:
       ```
@@ -141,10 +109,9 @@ artifacts:
       - [ ] 2.1 Implement data export function
       - [ ] 2.2 Add CSV formatting utilities
 
-      ## 3. Parallelization Plan
+      ## 3. Verification
 
-      - [ ] 3.1 Delegate test matrix design to a sub-agent using proposal.md, design.md, and specs as context; main agent reviews and integrates results
-      - [ ] 3.2 Run independent module impact analysis in parallel; block shared contract edits until main agent resolves findings
+      - [ ] 3.1 Add integration coverage for the export endpoint
       ```
 
       参考 specs 确定需要构建什么，参考 design 确定如何构建。每个任务都应可验证，完成标准要清晰。
@@ -156,9 +123,8 @@ apply:
   requires: [tasks]
   tracks: tasks.md
   instruction: |
-    读取上下文文件，先识别 tasks.md 中的依赖、并发计划和 sub-agent 委派建议，再完成待办任务。
-    对互不冲突的调研、测试、验证或独立实现切片，主 agent 应按 tasks.md 规划指派 sub-agent 并汇总结果。
-    涉及共享接口、架构决策、同一文件修改或未解决依赖的任务必须由主 agent 顺序处理或先完成协调。
-    每个任务完成时标记 checkbox。
-    实现时必须遵守 design.md 中的架构决策和验证要求。
-    遇到 blocker 或需要澄清时暂停。
+    读取上下文文件后完成待办任务。每轮开始前重读 tasks.md；每个任务取得验证证据后立即把 checkbox 标记为 `- [x]`，然后再次重读 tasks.md 再选择下一项。
+    实现必须遵守 design.md 中已记录的决策；发现决策不可行时，先更新 artifacts 再继续，不要绕过设计直接实现。
+    主动识别并充分使用 sub-agent 处理互不冲突的调研、测试、验证和隔离实现；共享文件、接口、架构决策、最终集成和 checkbox 更新由主 agent 负责。
+    错误优先自行修复；需要用户决策时给出 2-3 个互斥选项、推荐项及取舍。
+    全部任务完成后继续最终验证、必要文档更新、archive 和 scoped Git commit；用户明确限制范围或仓库规则/权限阻塞时除外。push、发布或部署仅在用户明确要求时执行。

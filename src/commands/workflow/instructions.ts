@@ -335,7 +335,7 @@ export async function generateApplyInstructions(
     instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with openspec-continue-change.`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
-    instruction = 'All tasks are complete! This change is ready to be archived.\nConsider running tests and reviewing the changes before archiving.';
+    instruction = 'All tasks are complete. Continue the delivery closeout: run final validation, update necessary documentation, archive the change, and create a scoped Git commit. Only push, publish, or deploy when the user explicitly requested it.';
   } else if (!tracksFile) {
     // No tracking file configured in schema - ready to apply
     state = 'ready';

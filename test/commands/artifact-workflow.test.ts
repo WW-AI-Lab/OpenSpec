@@ -624,8 +624,13 @@ apply:
       });
       expect(result.exitCode).toBe(0);
       // Should show the instruction from spec-driven schema apply block
-      expect(result.stdout).toContain('先识别 tasks.md 中的依赖、并发计划和 sub-agent 委派建议');
-      expect(result.stdout).toContain('主 agent 应按 tasks.md 规划指派 sub-agent 并汇总结果');
+      expect(result.stdout).toContain('读取上下文文件后完成待办任务');
+      expect(result.stdout).toContain('每轮开始前重读 tasks.md');
+      expect(result.stdout).toContain('每个任务取得验证证据后立即把 checkbox 标记');
+      expect(result.stdout).toContain('主动识别并充分使用 sub-agent');
+      expect(result.stdout).toContain('2-3 个互斥选项');
+      expect(result.stdout).toContain('scoped Git commit');
+      expect(result.stdout).toContain('实现必须遵守 design.md 中已记录的决策');
     });
 
     it('shows all_done state when all tasks are complete', async () => {
@@ -646,7 +651,10 @@ apply:
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('complete ✓');
-      expect(result.stdout).toContain('ready to be archived');
+      expect(result.stdout).toContain('Continue the delivery closeout');
+      expect(result.stdout).toContain('update necessary documentation');
+      expect(result.stdout).toContain('archive the change');
+      expect(result.stdout).toContain('scoped Git commit');
     });
 
     it('uses spec-driven schema apply configuration', async () => {
